@@ -62,6 +62,9 @@ Paired MPJPE-G on the 1,780 unseen clips that succeed at all three late checkpoi
 Earlier unseen MuJoCo results: it29450 98.0% / 90.5% / 19.1 mm; it8400 97.0% / 84.5%. The seen-200 subset has
 harder clips than the unseen-200, which is why seen scores lower here.
 
+**MuJoCo, full set** (1,985 unseen, 10 s, g1 encoder): 98.4% paper / 91.9% official-like, MPJPE-L 16.6, PA 12.4, G 113 mm.
+**Hardware-like condition** (Booster deploy torque caps: legs 30/35/20/40/20 N·m vs 68/76/38/112/38 trained; + 20 ms action latency + PD ×0.8), 1,985 unseen: 95.9% / 87.7%, MPJPE-L 19.3 mm.
+
 **ONNX vs PyTorch** (400 clips, ~190k control steps, PyTorch driving, ONNX evaluated on the same inputs):
 - 392/400 clips: max |Δa| ≤ 1.4e-5, median 1.1e-5 (float32; ≈1e-5 rad in joint targets);
 - 8/400 clips: one isolated jump of 8e-3 to 2e-2, from a single FSQ token sitting exactly on a quantization
