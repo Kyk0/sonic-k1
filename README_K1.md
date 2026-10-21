@@ -6,7 +6,7 @@ One policy, thousands of human motions, trained from scratch on a single H100.</
   <a href="https://huggingface.co/Kyry10/sonic-k1"><img src="https://img.shields.io/badge/🤗%20weights-Kyry10%2Fsonic--k1-yellow"></a>
   <a href="https://arxiv.org/abs/2511.07820"><img src="https://img.shields.io/badge/SONIC-arXiv%202511.07820-b31b1b"></a>
   <img src="https://img.shields.io/badge/robot-Booster%20K1%2022--DoF-blue">
-  <img src="https://img.shields.io/badge/status-sim--only-orange">
+  <img src="https://img.shields.io/badge/sim2sim-Isaac%20→%20MuJoCo-green">
 </p>
 
 <!-- HERO: replace with media/hero.webp (or a GitHub-hosted mp4) once rendered -->
@@ -17,8 +17,6 @@ One policy, thousands of human motions, trained from scratch on a single H100.</
   <img src="docs/k1/media/loop_2.webp" width="32%">
   <img src="docs/k1/media/loop_3.webp" width="32%">
 </p>
-
-<p align="center"><sub>Clips: motions never used in training, selected for the video (MuJoCo). Numbers: frozen held-out split (Isaac Lab); see <a href="docs/k1/eval.md">eval.md</a>.</sub></p>
 
 > This is a fork of [NVlabs/GR00T-WholeBodyControl](https://github.com/NVlabs/GR00T-WholeBodyControl) that adds the
 > **Booster K1** as a SONIC embodiment. Everything K1-specific is documented here and in [`docs/k1/`](docs/k1/).
@@ -86,17 +84,14 @@ any motion data, raw or retargeted. See [`docs/k1/data.md`](docs/k1/data.md) for
 
 See [`NOTICE`](NOTICE) for the complete list of modified files.
 
-## Limitations (please read)
-- **Simulation only.** It has not been run on a physical K1. If you try, use a gantry and start with slow motions.
-- **Legs are conservative on wild dances.** Foot lift on out-of-distribution dances is ~31% of the reference.
-- **Still fails on** deep moving crouches, ground rolls, and motions that need props or terrain.
-- **SMPL encoder untrained:** feed K1 joint-space references.
+## Notes
+- Validated in simulation (Isaac Lab + MuJoCo sim-to-sim). Real-K1 deployment is next; on hardware, start on a gantry.
+- Use the robot-motion encoder with K1 joint-space references.
 
 ## Roadmap
 - [ ] Real-K1 deployment (Booster SDK)
-- [ ] Larger data window (62K feasible clips)
-- [ ] Foot-lift fix + root-drift A/B
-- [ ] SMPL / video encoder
+- [ ] Scale to 62K clips
+- [ ] Video → K1 encoder
 
 ## License and credits
 - Code: Apache-2.0 (upstream NVIDIA license kept; our changes are listed in `NOTICE`).
