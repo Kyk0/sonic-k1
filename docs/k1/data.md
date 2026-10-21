@@ -9,7 +9,9 @@ to the BONES Motion Capture Dataset License Agreement.
 ## 1. Retarget human → K1 with UMR
 - Retargeter: [UMR](https://github.com/hanyang9/UMR). We only link to it; no UMR code is vendored here.
 - Robot model: the official Booster `K1_22dof.xml` (booster_assets).
-- Config: [`umr_k1_official.json`](umr_k1_official.json), at **60 fps**.
+- Config: start from UMR's own `humanoid_retarget_booster_k1_example.json`. Switch it to the official K1 joint
+  names and the official `K1_22dof` model, and retarget at **60 fps**. We don't ship our modified config because UMR
+  has no license. Ask us for the settings if you need them.
 - Gotcha: UMR's SOMA path needs the SOMA-X assets from HF revision `06f07a4ba1`. Newer `SOMA_neutral.npz` files lack `bind_shape`.
 
 ## 2. Quality check
@@ -19,15 +21,16 @@ Every retargeted clip is checked for:
 - feet below or floating above the floor;
 - NaNs.
 
-About 99.6% of clips pass.
+142,024 of 142,537 retargeted clips pass (99.6%).
 
 ## 3. K1 feasibility tags
 The K1 is 0.93 m with no waist and no wrists. Clips are tagged *feasible / maybe / infeasible* from keywords and
 kinematics, e.g., elevated surfaces, props and lying on the floor. Training used feasible clips only.
 
 ## 4. Training list
-- **9,991 clips** (`train_10k`), stratified across Bones-SEED categories.
-- **1,985 clips** held out for evaluation before training.
+- **9,991 clips** (`train_10k`), stratified across Bones-SEED categories. All of them are QA-passing and tagged feasible
+  (the feasible pool is 62,427 clips).
+- **Eval split frozen before any training.** 1,985 of its clips are used as the unseen set, none of them in `train_10k`.
 
 ## 5. Convert to SONIC motion_lib
 ```bash

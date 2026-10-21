@@ -54,7 +54,7 @@ python gear_sonic/scripts/eval_k1_mujoco.py --policy checkpoints/sonic-k1 --moti
 
 ### 2. Bring your own motion
 Retarget any SMPL/BVH clip to K1 with [UMR](https://github.com/hanyang9/UMR), using
-[`docs/k1/umr_k1_official.json`](docs/k1/umr_k1_official.json), then convert it with
+UMR's Booster K1 example config, switched to the official K1 model (see [`docs/k1/data.md`](docs/k1/data.md)), then convert it with
 [`gear_sonic/data_process/convert_k1_npz_to_motion_lib.py`](gear_sonic/data_process/convert_k1_npz_to_motion_lib.py).
 Video → motion works too, through any monocular human-pose estimator (e.g. GVHMR) followed by UMR.
 
