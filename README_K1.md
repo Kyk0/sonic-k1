@@ -18,6 +18,8 @@ One policy, thousands of human motions, trained from scratch on a single H100.</
   <img src="docs/k1/media/loop_3.webp" width="32%">
 </p>
 
+<p align="center"><sub>Clips: motions never used in training, selected for the video (MuJoCo). Numbers: frozen held-out split (Isaac Lab); see <a href="docs/k1/eval.md">eval.md</a>.</sub></p>
+
 > This is a fork of [NVlabs/GR00T-WholeBodyControl](https://github.com/NVlabs/GR00T-WholeBodyControl) that adds the
 > **Booster K1** as a SONIC embodiment. Everything K1-specific is documented here and in [`docs/k1/`](docs/k1/).
 > The upstream README is kept unchanged in [`README.md`](README.md).

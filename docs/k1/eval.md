@@ -62,5 +62,6 @@ harder clips than the unseen-200, which is why seen scores lower here.
 `config.yaml` gives 92.5% official and MPJPE-L 15.3 mm on 200 unseen clips. This is consistent with the 1,985-clip result.
 
 ## Caveats
+- **Showcase videos:** Videos show motions that were never used in training, selected for the showcase. On 529 harder, dynamic clips screened in MuJoCo, 83.6% finish without a fall (60.1% under the strict rule). All reported numbers come from the frozen 1,985-clip held-out split. The sim-to-sim video uses clips from the frozen split (unseen-200 subset).
 - This is a Bones-SEED hold-out, **not** the SONIC paper's AMASS test set. The K1 is ~0.7× the G1's size, so millimetre errors don't compare with G1 or X2 numbers.
 - Evals use the stock mixed g1/teleop encoder sampling. A g1-encoder-only eval scored ~3 points higher (at it8400).
