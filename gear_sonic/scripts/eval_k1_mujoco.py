@@ -64,6 +64,8 @@ FOOT_BODIES = ["left_ankle_roll_link", "right_ankle_roll_link"]
 PUSH_LIN = np.array([0.35, 0.35, 0.14])
 PUSH_ANG = np.array([0.36, 0.36, 0.55])
 PUSH_INTERVAL_S = (4.0, 6.0)
+# torque caps of Booster's own K1 deploy config (booster_deploy K1_CFG.effort_limit), MuJoCo / serial joint order
+BOOSTER_DEPLOY_EFFORT = [6, 6, 14, 14, 14, 14, 14, 14, 14, 14, 30, 35, 20, 40, 20, 20, 30, 35, 20, 40, 20, 20]
 
 
 # --------------------------------------------------------------------------------------------
@@ -433,7 +435,7 @@ class ObsNoise:
 class K1MujocoSim:
     def __init__(self, plant: K1Plant, sim_dt: float = SIM_DT, kp_scale: float = 1.0, kd_scale: float = 1.0,
                  contact_timeconst: float | None = None, friction: float | None = None, payload_kg: float = 0.0,
-                 strength: float = 1.0, latency_s: float = 0.0):
+                 strength: float = 1.0, latency_s: float = 0.0, booster_effort_caps: bool = False):
         import mujoco
 
         self.mj = mujoco
@@ -460,6 +462,8 @@ class K1MujocoSim:
             m.body_mass[b] += payload_kg
             m.body_inertia[b] += payload_kg * 0.05 ** 2
         self.strength = strength
+        self.effort_mj = (np.minimum(plant.effort[plant.i2m], BOOSTER_DEPLOY_EFFORT) if booster_effort_caps
+                          else plant.effort[plant.i2m])
         self.latency_steps = int(round(latency_s / sim_dt))
         self.targets = []                   # (physics step issued, target) for action latency
         self.step_count = 0
@@ -509,7 +513,7 @@ class K1MujocoSim:
         """One policy step: `decimation` physics steps of explicit PD (MuJoCo actuator order)."""
         p, d = self.plant, self.d
         self.targets.append((self.step_count, np.asarray(target_il)[p.i2m]))
-        kp, kd, eff = self.kp[p.i2m], self.kd[p.i2m], p.effort[p.i2m] * self.strength
+        kp, kd, eff = self.kp[p.i2m], self.kd[p.i2m], self.effort_mj * self.strength
         for _ in range(self.decimation):
             # latency: newest target issued at least `latency_steps` physics steps ago (else the oldest one)
             due = [t for i, t in self.targets if i <= self.step_count - self.latency_steps]
@@ -544,7 +548,8 @@ class Evaluator:
                                kp_scale=opts.get("kp_scale", 1.0), kd_scale=opts.get("kd_scale", 1.0),
                                contact_timeconst=opts.get("contact_timeconst"), friction=opts.get("friction"),
                                payload_kg=opts.get("payload_kg", 0.0), strength=opts.get("strength", 1.0),
-                               latency_s=opts.get("latency_ms", 0.0) / 1000.0)
+                               latency_s=opts.get("latency_ms", 0.0) / 1000.0,
+                               booster_effort_caps=opts.get("booster_effort_caps", False))
         bb = self.cfg.algo.config.actor.backbone
         mc = self.cfg.manager_env.commands.motion
         self.num_future = int(mc.num_future_frames)
@@ -792,6 +797,8 @@ def main():
     ap.add_argument("--payload-kg", type=float, default=0.0, help="extra mass on the trunk")
     ap.add_argument("--latency-ms", type=float, default=0.0, help="action latency (physics-step resolution)")
     ap.add_argument("--strength", type=float, default=1.0, help="motor strength factor on torque and effort limits")
+    ap.add_argument("--booster-effort-caps", action="store_true",
+                    help="clamp torques to Booster's deploy limits (legs 30/35/20/40/20 N m instead of 68/76/38/112/38)")
     ap.add_argument("--name", default=None, help="run label for the printed table")
     ap.add_argument("--onnx", default=None, help="run the policy from <dir>/policy_g1.onnx instead of the .pt")
     ap.add_argument("--parity-onnx", default=None,
@@ -818,7 +825,7 @@ def main():
                 obs_noise=args.obs_noise, render_dir=args.render_dir, contact_timeconst=args.contact_timeconst,
                 onnx=args.onnx, parity_onnx=args.parity_onnx, obs_noise_scale=args.obs_noise_scale,
                 push_scale=args.push_scale, push_interval=args.push_interval, friction=args.friction, payload_kg=args.payload_kg,
-                latency_ms=args.latency_ms, strength=args.strength)
+                latency_ms=args.latency_ms, strength=args.strength, booster_effort_caps=args.booster_effort_caps)
     print(f"[eval_k1_mujoco] {len(clips)} clips loaded in {time.time() - t0:.1f}s; {args.workers} workers", flush=True)
 
     ctx = mp.get_context("spawn")
