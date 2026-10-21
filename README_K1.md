@@ -32,15 +32,14 @@ One policy, thousands of human motions, trained from scratch on a single H100.</
 
 Isaac Lab, 10 s windows, deterministic. Hold-out split of Bones-SEED. Full protocol: [`docs/k1/eval.md`](docs/k1/eval.md).
 
-**How much compute?** 1× H100 for under a week, ~1% of what the SONIC paper used for the G1:
+**How much compute?** 1× H100 for under a week (~135 GPU-hours), ~1.5% of what the SONIC paper used for the G1:
 
 | | SONIC (G1, paper) | SONIC-K1 |
 |---|---|---|
 | GPUs | 128 | **1** |
 | Training motions | ~100M frames (700 h) | 9,991 clips |
-| Unseen success (fall rule) | — | 98.7% |
+| Unseen success (fall rule) | — | 98.7% (Isaac), 99.0% (MuJoCo) |
 
-<!-- TBD: maybe plot success vs iteration (docs/k1/media/curve.png) -->
 
 ## Get started
 
@@ -80,7 +79,7 @@ any motion data, raw or retargeted. See [`docs/k1/data.md`](docs/k1/data.md) for
   - pushes and COM randomization ×0.7;
   - mass 0.9–1.3;
   - init std 0.5.
-- MuJoCo sim-to-sim player, verified against Isaac Lab: identical actor outputs, 5 ms physics, 50 Hz policy.
+- MuJoCo sim-to-sim eval: the actor gives the same outputs as in Isaac Lab, 5 ms physics, 50 Hz policy. 99.0% of 200 unseen clips run without a fall.
 - ONNX export (fused `policy_g1.onnx` + split encoder/decoder), with `--parity-onnx` to check it against PyTorch.
 
 See [`NOTICE`](NOTICE) for the complete list of modified files.
