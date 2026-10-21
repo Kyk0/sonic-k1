@@ -47,9 +47,12 @@ Isaac Lab, 10 s windows, deterministic. Hold-out split of Bones-SEED. Full proto
 ### 1. Play the policy in MuJoCo (CPU is fine)
 ```bash
 git clone https://github.com/Kyk0/sonic-k1 && cd sonic-k1
-# same environment as upstream SONIC (see README.md → Installation); MuJoCo + onnxruntime for playback
+# same environment as upstream SONIC (see README.md → Installation), plus mujoco + onnxruntime
 huggingface-cli download Kyry10/sonic-k1 --local-dir checkpoints/sonic-k1
-python gear_sonic/scripts/eval_k1_mujoco.py --policy checkpoints/sonic-k1 --motion path/to/k1_motion   # TBD final flags
+python gear_sonic/scripts/eval_k1_mujoco.py \
+    --checkpoint checkpoints/sonic-k1/sonic_k1_it50000_actor.pt \
+    --onnx checkpoints/sonic-k1/onnx \
+    --motion-dir <k1_motion_lib_dir> --out runs/mujoco --render-dir runs/mujoco/qpos
 ```
 
 ### 2. Bring your own motion
@@ -78,7 +81,7 @@ any motion data, raw or retargeted. See [`docs/k1/data.md`](docs/k1/data.md) for
   - mass 0.9–1.3;
   - init std 0.5.
 - MuJoCo sim-to-sim player, verified against Isaac Lab: identical actor outputs, 5 ms physics, 50 Hz policy.
-- ONNX export for the K1 encoder/decoder.
+- ONNX export (fused `policy_g1.onnx` + split encoder/decoder), with `--parity-onnx` to check it against PyTorch.
 
 See [`NOTICE`](NOTICE) for the complete list of modified files.
 

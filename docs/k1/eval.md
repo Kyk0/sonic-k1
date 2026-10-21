@@ -44,7 +44,7 @@ Paired MPJPE-G on the 1,780 unseen clips that succeed at all three late checkpoi
 - Actor outputs are identical to Isaac Lab on the same state (TF32 off).
 - `k1.xml` overrides: hip-roll effort 76, head armature 0.001.
 - MuJoCo success at it50000: ⟨TBD⟩.
-- ONNX vs PyTorch max |Δa|: ⟨TBD⟩.
+- ONNX vs PyTorch: max |Δa| = 1.1e-5 (fused and split graphs), ≈1e-5 rad in joint targets.
 
 ## Caveats
 - This is a Bones-SEED hold-out, **not** the SONIC paper's AMASS test set. The K1 is ~0.7× the G1's size, so millimetre errors don't compare with G1 or X2 numbers.
