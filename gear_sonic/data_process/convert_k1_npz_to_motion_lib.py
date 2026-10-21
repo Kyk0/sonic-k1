@@ -18,8 +18,8 @@ from k1.xml at FK time -- NOT the IsaacLab 23-body order used elsewhere
 
 Usage:
     python gear_sonic/data_process/convert_k1_npz_to_motion_lib.py \
-        --input ../../data/k1_retarget/full/k1_official \
-        --output ../../data/sonic_motionlib/k1_sample_1k \
+        --input <dir with K1 retarget npz files> \
+        --output <motion_lib output dir> \
         --clip-list ../../configs/train_sample_1k.txt \
         --num_workers 16
 """

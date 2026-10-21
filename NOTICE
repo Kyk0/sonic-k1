@@ -1,0 +1,51 @@
+NOTICE
+
+This is a modified version of NVlabs/GR00T-WholeBodyControl (Apache-2.0),
+https://github.com/NVlabs/GR00T-WholeBodyControl (base: v1.1, commit a0732b6),
+with Booster K1 support added by Kyrylo Kolesnichenko, Kent State University, 2026.
+
+The upstream LICENSE (Apache-2.0 for source code; NVIDIA Open Model License for NVIDIA's model weights)
+and the files in legal/ apply unchanged to all upstream code. The SONIC-K1 policy weights were trained
+from scratch for the Booster K1 and contain no NVIDIA model weights.
+
+Third-party material
+- Booster K1 robot description (URDF, MJCF, meshes) in gear_sonic/data/assets/robot_description/urdf/k1/
+  and gear_sonic/data/assets/robot_description/mjcf/k1.xml: from BoosterRobotics/booster_assets
+  (https://github.com/BoosterRobotics/booster_assets), BSD 3-Clause License, Copyright (c) 2025 BoosterRobotics;
+  see gear_sonic/data/assets/robot_description/urdf/k1/LICENSE. Meshes are unmodified; k1.xml drops the two
+  camera bodies.
+- K1 motor constants and the gain formula in gear_sonic/envs/manager_env/robots/k1.py follow Booster's
+  BeyondMimic K1 configuration (booster_train).
+- gear_sonic/scripts/eval_k1_mujoco.py is adapted from gear_sonic/scripts/eval_x2_mujoco.py of
+  https://github.com/meetsitaram/GR00T-WholeBodyControl-X2 (Apache-2.0).
+
+Training data
+Training data includes Motion Data by Bones Studio (https://bones.studio/). Use of the underlying dataset is
+subject to the BONES Motion Capture Dataset License Agreement. No motion data is included in this repository.
+
+Files added (A) or modified (M) relative to upstream v1.1
+  M	.gitattributes
+  A	gear_sonic/config/exp/manager/universal_token/all_modes/sonic_k1.yaml
+  A	gear_sonic/config/manager_env/recorders/trajectory.yaml
+  A	gear_sonic/data/assets/robot_description/mjcf/k1.xml
+  A	gear_sonic/data/assets/robot_description/mjcf/meshes
+  A	gear_sonic/data/assets/robot_description/urdf/k1/LICENSE
+  A	gear_sonic/data/assets/robot_description/urdf/k1/k1.urdf
+  A	gear_sonic/data_process/convert_k1_csv_to_motion_lib.py
+  A	gear_sonic/data_process/convert_k1_npz_to_motion_lib.py
+  M	gear_sonic/envs/manager_env/mdp/commands.py
+  M	gear_sonic/envs/manager_env/mdp/rewards.py
+  M	gear_sonic/envs/manager_env/modular_tracking_env_cfg.py
+  M	gear_sonic/envs/manager_env/robots/__init__.py
+  A	gear_sonic/envs/manager_env/robots/k1.py
+  M	gear_sonic/eval_agent_trl.py
+  A	gear_sonic/scripts/eval_k1_mujoco.py
+  A	gear_sonic/scripts/k1_actor_only_checkpoint.py
+  A	gear_sonic/scripts/k1_clean_onnx.py
+  M	gear_sonic/train_agent_trl.py
+  M	gear_sonic/trl/callbacks/im_eval_callback.py
+  M	gear_sonic/trl/utils/order_converter.py
+  A	gear_sonic/utils/k1_openloop.py
+  A	gear_sonic/utils/k1_reset_check.py
+  A	gear_sonic/utils/k1_rollout_recorder.py
+  A	gear_sonic/data/assets/robot_description/urdf/k1/meshes/*.STL (52 Booster K1 meshes)
