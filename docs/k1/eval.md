@@ -16,7 +16,7 @@ All numbers are for checkpoint **it50000** (`model_step_050000.pt`), determinist
 
 The official foot term is strict for the K1: most of the gap between official and no-foot is slow foot drift, not falls.
 
-## Metrics (on successful rollouts)
+## Metrics (Isaac: over successful rollouts, SONIC/PHC convention; MuJoCo: over all rollouts)
 - **MPJPE-L:** local (root-relative) mean per-joint position error, mm.
 - **PA-MPJPE:** after Procrustes alignment, mm.
 - **MPJPE-G:** global, includes root drift, mm.
@@ -44,7 +44,7 @@ Paired MPJPE-G on the 1,780 unseen clips that succeed at all three late checkpoi
 - Actor outputs are identical to Isaac Lab on the same state (TF32 off).
 - `k1.xml` overrides: hip-roll effort 76, head armature 0.001.
 
-| MuJoCo, it50000 (g1 encoder, 10 s) | Paper-style | Official-like | MPJPE-L | PA | G | Joint jerk vs ref |
+| MuJoCo, it50000 (g1 encoder, 10 s, MPJPE over all clips) | Paper-style | Official-like | MPJPE-L | PA | G | Joint jerk vs ref |
 |---|---|---|---|---|---|---|
 | Unseen 200 | **99.0%** | 90.5% | 16.2 | 12.3 | 125 | 0.87× |
 | Seen 200 | 96.0% | 93.5% | 16.3 | 11.9 | 83 | — |
