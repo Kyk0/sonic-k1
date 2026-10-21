@@ -60,6 +60,10 @@ EE_HEIGHT_THR = 0.25           # eval.yaml ee_body_pos (z only)
 FOOT_POS_THR = 0.2             # training foot_pos_xyz (xyz, heading-aligned reference)
 EE_BODIES = ["left_ankle_roll_link", "right_ankle_roll_link", "left_elbow_yaw_link", "right_elbow_yaw_link"]
 FOOT_BODIES = ["left_ankle_roll_link", "right_ankle_roll_link"]
+# training push_robot event (push_by_setting_velocity, every 4-6 s): max |delta| of root lin (x, y, z) / ang (roll, pitch, yaw) vel
+PUSH_LIN = np.array([0.35, 0.35, 0.14])
+PUSH_ANG = np.array([0.36, 0.36, 0.55])
+PUSH_INTERVAL_S = (4.0, 6.0)
 
 
 # --------------------------------------------------------------------------------------------
@@ -409,8 +413,9 @@ def g1_tokenizer_obs(clip: dict, step: int, robot_root_quat: np.ndarray, num_fut
 class ObsNoise:
     """Optional additive uniform obs noise, ranges read from the run config (enable_corruption)."""
 
-    def __init__(self, cfg, seed: int):
+    def __init__(self, cfg, seed: int, scale: float = 1.0):
         self.rng = np.random.default_rng(seed)
+        self.scale = scale
         self.ranges = {}
         for group in ("policy", "tokenizer"):
             for name, term in cfg.manager_env.observations[group].items():
@@ -419,7 +424,7 @@ class ObsNoise:
 
     def __call__(self, name, shape):
         lo, hi = self.ranges.get(name, (0.0, 0.0))
-        return self.rng.uniform(lo, hi, size=shape) if hi > lo else np.zeros(shape)
+        return self.scale * self.rng.uniform(lo, hi, size=shape) if hi > lo else np.zeros(shape)
 
 
 # --------------------------------------------------------------------------------------------
@@ -427,7 +432,8 @@ class ObsNoise:
 # --------------------------------------------------------------------------------------------
 class K1MujocoSim:
     def __init__(self, plant: K1Plant, sim_dt: float = SIM_DT, kp_scale: float = 1.0, kd_scale: float = 1.0,
-                 contact_timeconst: float | None = None):
+                 contact_timeconst: float | None = None, friction: float | None = None, payload_kg: float = 0.0,
+                 strength: float = 1.0, latency_s: float = 0.0):
         import mujoco
 
         self.mj = mujoco
@@ -447,6 +453,16 @@ class K1MujocoSim:
         # At dt 1 ms the retargeted RSI poses (forearm inside the hip cylinders by up to ~4 cm) get kicked out.
         if contact_timeconst is not None:
             m.geom_solref[:, 0] = contact_timeconst
+        if friction is not None:            # sliding friction of every geom (MuJoCo takes the max of a contact pair)
+            m.geom_friction[:, 0] = friction
+        if payload_kg:                      # point mass at the trunk COM
+            b = m.body("trunk").id
+            m.body_mass[b] += payload_kg
+            m.body_inertia[b] += payload_kg * 0.05 ** 2
+        self.strength = strength
+        self.latency_steps = int(round(latency_s / sim_dt))
+        self.targets = []                   # (physics step issued, target) for action latency
+        self.step_count = 0
         self.m, self.d = m, mujoco.MjData(m)
         self.decimation = max(1, int(round(CONTROL_DT / sim_dt)))
         self.kp = plant.kp * kp_scale
@@ -486,17 +502,29 @@ class K1MujocoSim:
             d.qvel[6:] = np.asarray(jvel_il)[self.plant.i2m]
         d.qacc_warmstart[:] = 0.0
         d.ctrl[:] = 0.0
+        self.targets, self.step_count = [], 0
         self.mj.mj_forward(self.m, d)
 
     def step_pd(self, target_il):
         """One policy step: `decimation` physics steps of explicit PD (MuJoCo actuator order)."""
         p, d = self.plant, self.d
-        tgt = np.asarray(target_il)[p.i2m]
-        kp, kd, eff = self.kp[p.i2m], self.kd[p.i2m], p.effort[p.i2m]
+        self.targets.append((self.step_count, np.asarray(target_il)[p.i2m]))
+        kp, kd, eff = self.kp[p.i2m], self.kd[p.i2m], p.effort[p.i2m] * self.strength
         for _ in range(self.decimation):
-            tau = kp * (tgt - d.qpos[7:]) - kd * d.qvel[6:]
+            # latency: newest target issued at least `latency_steps` physics steps ago (else the oldest one)
+            due = [t for i, t in self.targets if i <= self.step_count - self.latency_steps]
+            tgt = due[-1] if due else self.targets[0][1]
+            tau = self.strength * (kp * (tgt - d.qpos[7:]) - kd * d.qvel[6:])
             d.ctrl[:] = np.clip(tau, -eff, eff)
             self.mj.mj_step(self.m, d)
+            self.step_count += 1
+        if len(self.targets) > 64:
+            self.targets = self.targets[-64:]
+
+    def push(self, rng, scale):
+        """Training-style push: add a random root velocity change (world lin, body ang), scaled."""
+        self.d.qvel[:3] += rng.uniform(-1, 1, 3) * PUSH_LIN * scale
+        self.d.qvel[3:6] += rng.uniform(-1, 1, 3) * PUSH_ANG * scale
 
     def qpos29(self):
         return self.d.qpos.copy()
@@ -514,7 +542,9 @@ class Evaluator:
         self.plant = K1Plant()
         self.sim = K1MujocoSim(self.plant, sim_dt=opts.get("sim_dt", SIM_DT),
                                kp_scale=opts.get("kp_scale", 1.0), kd_scale=opts.get("kd_scale", 1.0),
-                               contact_timeconst=opts.get("contact_timeconst"))
+                               contact_timeconst=opts.get("contact_timeconst"), friction=opts.get("friction"),
+                               payload_kg=opts.get("payload_kg", 0.0), strength=opts.get("strength", 1.0),
+                               latency_s=opts.get("latency_ms", 0.0) / 1000.0)
         bb = self.cfg.algo.config.actor.backbone
         mc = self.cfg.manager_env.commands.motion
         self.num_future = int(mc.num_future_frames)
@@ -552,7 +582,10 @@ class Evaluator:
 
     def run_clip(self, clip, max_steps=500, seed=0):
         p, s = self.plant, self.sim
-        noise = ObsNoise(self.cfg, seed) if self.opts.get("obs_noise") else None
+        noise = ObsNoise(self.cfg, seed, self.opts.get("obs_noise_scale", 1.0)) if self.opts.get("obs_noise") else None
+        push_scale = self.opts.get("push_scale", 0.0)
+        push_rng = np.random.default_rng(10_000 + seed)
+        next_push = push_rng.uniform(*PUSH_INTERVAL_S) if push_scale > 0 else None
         n_steps = min(max_steps, clip["T"] - 1)
         self.reset(clip, 0)
         hist, last_a = ProprioHistory(), np.zeros(22, dtype=np.float32)
@@ -566,6 +599,9 @@ class Evaluator:
             for m, act in (self.parity or {}).items():   # raw (pre-clip) action difference, same inputs
                 par[m] = max(par[m], float(np.max(np.abs(act(prop[None], tok[None])[0] - raw))))
             a = np.clip(raw, -ACTION_CLIP, ACTION_CLIP).astype(np.float32)
+            if next_push is not None and n * CONTROL_DT >= next_push:
+                s.push(push_rng, push_scale)
+                next_push += push_rng.uniform(*PUSH_INTERVAL_S)
             s.step_pd(p.default_pos + p.action_scale * a)
             last_a = a
             k = n + 1                                   # reference frame matching the post-step state
@@ -740,6 +776,13 @@ def main():
     ap.add_argument("--contact-timeconst", type=float, default=None,
                     help="override geom solref timeconst (k1.xml: 0.001, effectively 2*sim_dt)")
     ap.add_argument("--obs-noise", action="store_true", help="add the training/eval obs noise (Isaac eval keeps it on)")
+    ap.add_argument("--obs-noise-scale", type=float, default=1.0, help="multiplier on the obs noise ranges (with --obs-noise)")
+    ap.add_argument("--push-scale", type=float, default=0.0,
+                    help="training-style velocity pushes every 4-6 s, ranges x this factor (1 = training range)")
+    ap.add_argument("--friction", type=float, default=None, help="sliding friction for all geoms (default: MJCF)")
+    ap.add_argument("--payload-kg", type=float, default=0.0, help="extra mass on the trunk")
+    ap.add_argument("--latency-ms", type=float, default=0.0, help="action latency (physics-step resolution)")
+    ap.add_argument("--strength", type=float, default=1.0, help="motor strength factor on torque and effort limits")
     ap.add_argument("--name", default=None, help="run label for the printed table")
     ap.add_argument("--onnx", default=None, help="run the policy from <dir>/policy_g1.onnx instead of the .pt")
     ap.add_argument("--parity-onnx", default=None,
@@ -764,7 +807,9 @@ def main():
     cfg_dict = OmegaConf.to_container(cfg, resolve=False)
     opts = dict(max_steps=args.max_steps, sim_dt=args.sim_dt, kp_scale=args.kp_scale, kd_scale=args.kd_scale,
                 obs_noise=args.obs_noise, render_dir=args.render_dir, contact_timeconst=args.contact_timeconst,
-                onnx=args.onnx, parity_onnx=args.parity_onnx)
+                onnx=args.onnx, parity_onnx=args.parity_onnx, obs_noise_scale=args.obs_noise_scale,
+                push_scale=args.push_scale, friction=args.friction, payload_kg=args.payload_kg,
+                latency_ms=args.latency_ms, strength=args.strength)
     print(f"[eval_k1_mujoco] {len(clips)} clips loaded in {time.time() - t0:.1f}s; {args.workers} workers", flush=True)
 
     ctx = mp.get_context("spawn")
