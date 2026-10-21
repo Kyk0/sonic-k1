@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use SONIC-K1, please cite it and the original SONIC paper."
+title: "SONIC-K1: Whole-Body Motion Tracking for the Booster K1 Humanoid"
+version: 0.1.0
+date-released: 2026-10-XX
+authors:
+  - family-names: "Kolesnichenko"
+    given-names: "Kyrylo"
+    affiliation: "Kent State University"
+repository-code: "https://github.com/Kyk0/sonic-k1"
+url: "https://huggingface.co/Kyry10/sonic-k1"
+license: Apache-2.0
+keywords:
+  - humanoid-robotics
+  - booster-k1
+  - motion-tracking
+  - whole-body-control
+  - reinforcement-learning
+references:
+  - type: article
+    title: "SONIC: Supersizing Motion Tracking for Natural Humanoid Whole-Body Control"
+    authors:
+      - family-names: "Luo"
+        given-names: "Zhengyi"
+      - name: "et al."
+    journal: "arXiv preprint arXiv:2511.07820"
+    year: 2025
