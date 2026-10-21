@@ -1,6 +1,6 @@
 <h1 align="center">SONIC-K1</h1>
 <p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>
-One policy, thousands of human motions, trained from scratch on a single H100.</p>
+One policy, thousands of human motions, trained from scratch with ~1% of SONIC's compute.</p>
 
 <p align="center">
   <a href="https://huggingface.co/Kyry10/sonic-k1"><img src="https://img.shields.io/badge/🤗%20weights-Kyry10%2Fsonic--k1-yellow"></a>
@@ -32,11 +32,11 @@ One policy, thousands of human motions, trained from scratch on a single H100.</
 
 Isaac Lab, 10 s windows, deterministic. Hold-out split of Bones-SEED. Full protocol: [`docs/k1/eval.md`](docs/k1/eval.md).
 
-**How much compute?** 1× H100 for under a week (~135 GPU-hours), ~1.5% of what the SONIC paper used for the G1:
+**How much compute?** About 100 GPU-hours, ~1% of what the SONIC paper used for the G1:
 
 | | SONIC (G1, paper) | SONIC-K1 |
 |---|---|---|
-| GPUs | 128 | **1** |
+| GPU-hours | ~9,000 | **~100** |
 | Training motions | ~100M frames (700 h) | 9,991 clips |
 | Unseen success (fall rule) | — | 98.7% (Isaac), 99.0% (MuJoCo) |
 
