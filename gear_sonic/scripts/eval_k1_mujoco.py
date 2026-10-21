@@ -585,7 +585,9 @@ class Evaluator:
         noise = ObsNoise(self.cfg, seed, self.opts.get("obs_noise_scale", 1.0)) if self.opts.get("obs_noise") else None
         push_scale = self.opts.get("push_scale", 0.0)
         push_rng = np.random.default_rng(10_000 + seed)
-        next_push = push_rng.uniform(*PUSH_INTERVAL_S) if push_scale > 0 else None
+        interval = tuple(self.opts.get("push_interval") or PUSH_INTERVAL_S)
+        next_push = push_rng.uniform(*interval) if push_scale > 0 else None
+        pushes = []                                      # |delta v_lin| (m/s) of every applied push
         n_steps = min(max_steps, clip["T"] - 1)
         self.reset(clip, 0)
         hist, last_a = ProprioHistory(), np.zeros(22, dtype=np.float32)
@@ -600,8 +602,10 @@ class Evaluator:
                 par[m] = max(par[m], float(np.max(np.abs(act(prop[None], tok[None])[0] - raw))))
             a = np.clip(raw, -ACTION_CLIP, ACTION_CLIP).astype(np.float32)
             if next_push is not None and n * CONTROL_DT >= next_push:
+                v0 = s.d.qvel[:3].copy()
                 s.push(push_rng, push_scale)
-                next_push += push_rng.uniform(*PUSH_INTERVAL_S)
+                pushes.append(float(np.linalg.norm(s.d.qvel[:3] - v0)))
+                next_push += push_rng.uniform(*interval)
             s.step_pd(p.default_pos + p.action_scale * a)
             last_a = a
             k = n + 1                                   # reference frame matching the post-step state
@@ -633,7 +637,7 @@ class Evaluator:
                 result = "anchor_pos" if fired["anchor_pos"] else "anchor_ori_full"
                 break
         out = {k: np.asarray(v) for k, v in rec.items()}
-        out.update(result=result, checks=checks, n_steps=n_steps, wall=time.time() - t0, parity=par)
+        out.update(result=result, checks=checks, n_steps=n_steps, wall=time.time() - t0, parity=par, pushes=pushes)
         return out
 
 
@@ -682,6 +686,9 @@ def clip_metrics(r: dict, dt: float = CONTROL_DT) -> dict:
         res["action_rate_l2"] = float(np.mean(np.sum(np.diff(a, axis=0) ** 2, axis=-1)))
     for m, v in r.get("parity", {}).items():
         res[f"parity_max_abs_{m}"] = v
+    if r.get("pushes") is not None:
+        res["n_pushes"] = len(r["pushes"])
+        res["push_dv_mean"] = float(np.mean(r["pushes"])) if r["pushes"] else 0.0
     return res
 
 
@@ -719,7 +726,7 @@ def _worker_run(clip):
     return met
 
 
-AGG_KEYS = ["survival", "official_survival", "mpjpe_g", "mpjpe_l", "mpjpe_pa", "accel_dist", "vel_dist",
+AGG_KEYS = ["n_pushes", "push_dv_mean", "survival", "official_survival", "mpjpe_g", "mpjpe_l", "mpjpe_pa", "accel_dist", "vel_dist",
             "mpjpe_g_official", "mpjpe_l_official", "accel_dist_official", "vel_dist_official",
             "joint_err_rad", "joint_acc", "ref_joint_acc", "joint_jerk", "ref_joint_jerk", "action_rate",
             "action_rate_l2"]
@@ -779,6 +786,8 @@ def main():
     ap.add_argument("--obs-noise-scale", type=float, default=1.0, help="multiplier on the obs noise ranges (with --obs-noise)")
     ap.add_argument("--push-scale", type=float, default=0.0,
                     help="training-style velocity pushes every 4-6 s, ranges x this factor (1 = training range)")
+    ap.add_argument("--push-interval", type=float, nargs=2, default=None, metavar=("MIN_S", "MAX_S"),
+                    help="seconds between pushes (default: training 4-6 s)")
     ap.add_argument("--friction", type=float, default=None, help="sliding friction for all geoms (default: MJCF)")
     ap.add_argument("--payload-kg", type=float, default=0.0, help="extra mass on the trunk")
     ap.add_argument("--latency-ms", type=float, default=0.0, help="action latency (physics-step resolution)")
@@ -808,7 +817,7 @@ def main():
     opts = dict(max_steps=args.max_steps, sim_dt=args.sim_dt, kp_scale=args.kp_scale, kd_scale=args.kd_scale,
                 obs_noise=args.obs_noise, render_dir=args.render_dir, contact_timeconst=args.contact_timeconst,
                 onnx=args.onnx, parity_onnx=args.parity_onnx, obs_noise_scale=args.obs_noise_scale,
-                push_scale=args.push_scale, friction=args.friction, payload_kg=args.payload_kg,
+                push_scale=args.push_scale, push_interval=args.push_interval, friction=args.friction, payload_kg=args.payload_kg,
                 latency_ms=args.latency_ms, strength=args.strength)
     print(f"[eval_k1_mujoco] {len(clips)} clips loaded in {time.time() - t0:.1f}s; {args.workers} workers", flush=True)
 
