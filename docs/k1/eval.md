@@ -29,6 +29,16 @@ The official foot term is strict for the K1: most of the gap between official an
 
 Unseen per body group (MPJPE-L, mm): legs 17.4, hands + head 11.7, feet 18.7.
 
+## Full-length clips, it50000 (no 10 s cut, 1,985 unseen)
+| Official | No-foot | Paper-style | MPJPE-L | PA | G |
+|---|---|---|---|---|---|
+| 93.4% | 97.5% | 98.6% | 15.0 | 11.1 | 136 |
+
+## Teleop mode, it50000 (encoder 1: head + hands targets, lower-body joint targets, anchor orientation; 10 s, 1,985 unseen)
+| Official | No-foot | Paper-style | MPJPE-L | PA |
+|---|---|---|---|---|
+| 93.4% | 97.8% | 98.7% | 15.1 | 11.0 |
+
 ## Over training (unseen, same protocol)
 | Iteration | Official | No-foot | Paper-style | MPJPE-L |
 |---|---|---|---|---|
