@@ -202,6 +202,36 @@ class H2Converter(IsaacLabMuJoCoConverter):
     FOOT_BODY_NAMES = ["left_ankle_roll_link", "right_ankle_roll_link"]
 
 
+class K1Converter(IsaacLabMuJoCoConverter):
+    """K1 robot joint/body order converter between IsaacLab and MuJoCo conventions.
+
+    K1 has no waist and no wrists; VR_3POINTS uses trunk + elbow_yaw links (K1's most
+    distal arm link) instead of wrist links.
+    """
+
+    def __init__(self):
+        from gear_sonic.envs.manager_env.robots.k1 import (
+            K1_ISAACLAB_JOINTS,
+            K1_ISAACLAB_TO_MUJOCO_BODY,
+            K1_ISAACLAB_TO_MUJOCO_DOF,
+            K1_MUJOCO_TO_ISAACLAB_BODY,
+            K1_MUJOCO_TO_ISAACLAB_DOF,
+        )
+
+        self.JOINT_NAMES = K1_ISAACLAB_JOINTS
+        self.DOF_MAPPINGS = {
+            ("isaaclab", "mujoco"): K1_ISAACLAB_TO_MUJOCO_DOF,
+            ("mujoco", "isaaclab"): K1_MUJOCO_TO_ISAACLAB_DOF,
+        }
+        self.BODY_MAPPINGS = {
+            ("isaaclab", "mujoco"): K1_ISAACLAB_TO_MUJOCO_BODY,
+            ("mujoco", "isaaclab"): K1_MUJOCO_TO_ISAACLAB_BODY,
+        }
+
+    VR_3POINTS_BODY_NAMES = ["trunk", "left_elbow_yaw_link", "right_elbow_yaw_link"]
+    FOOT_BODY_NAMES = ["left_ankle_roll_link", "right_ankle_roll_link"]
+
+
 def load_qpos_from_csv(csv_path: str) -> torch.Tensor:
     """Load qpos [T, D] from CSV."""
     import pandas as pd

@@ -319,6 +319,16 @@ def main(config: OmegaConf):
     env_config.config.experiment_dir = str(Path(config.experiment_dir))
 
     env = create_manager_env(config, device, args_cli)
+    if config.get("openloop_check", False):
+        from gear_sonic.utils.k1_openloop import run_openloop
+
+        run_openloop(env)
+        os._exit(0)
+    if config.get("reset_check", False):
+        from gear_sonic.utils.k1_reset_check import run_reset_check
+
+        run_reset_check(env)
+        os._exit(0)
     if config.get("replay", False):
         _save_video_path = config.get("replay_save_video", None)
         env.run_replay(

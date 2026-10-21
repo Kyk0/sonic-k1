@@ -1,0 +1,5 @@
+_target_: gear_sonic.envs.manager_env.mdp.recorders.RecordersCfg
+
+trajectory:
+  _target_: gear_sonic.envs.manager_env.mdp.recorders.TrajectoryRecorderCfg
+  save_path: ${manager_env.config.save_rendering_dir}

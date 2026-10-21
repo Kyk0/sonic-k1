@@ -37,7 +37,15 @@ import shutil
 import subprocess
 import sys
 
-sys.path.append(os.getcwd())
+# Fix sys.path: an editable install of gear_sonic from a different checkout can shadow our local repo's gear_sonic/
+# package since sys.path.append() only adds to the end. Insert repo root first,
+# same fix as train_agent_trl.py.
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+_repo_root = os.path.dirname(_script_dir)
+if _script_dir in sys.path:
+    sys.path.remove(_script_dir)
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
 import logging
 from pathlib import Path
 
@@ -604,6 +612,11 @@ def main(override_config: omegaconf.OmegaConf):
         max_render_steps = config.get("max_render_steps", 0)
 
         run_once = config.get("run_once", False)
+        _k1_rec = None
+        if config.get("k1_rollout_dir", None):
+            from gear_sonic.utils.k1_rollout_recorder import K1RolloutRecorder
+
+            _k1_rec = K1RolloutRecorder(env, str(config.k1_rollout_dir), int(config.get("k1_rollout_max_steps", 1500)))
         envs_completed = torch.zeros(config.num_envs, dtype=torch.bool, device=device)
 
         with torch.no_grad():
@@ -632,6 +645,10 @@ def main(override_config: omegaconf.OmegaConf):
                     results[2],
                     results[3],
                 )  # noqa: F841
+
+                if _k1_rec is not None and _k1_rec.step(dones):
+                    _k1_rec.save()
+                    break
 
                 if eval_step_callbacks:
                     all_want_exit = all(

@@ -11,6 +11,21 @@ from transformers import TrainerCallback
 import wandb
 
 
+# K1 port: im_eval body subsets are written with G1 link names; map them to the K1 bodies when the G1 name is absent.
+_K1_EVAL_BODY_MAP = {
+    "pelvis": "trunk", "torso_link": "trunk",
+    "left_knee_link": "left_knee_pitch_link", "right_knee_link": "right_knee_pitch_link",
+    "left_wrist_yaw_link": "left_elbow_yaw_link", "right_wrist_yaw_link": "right_elbow_yaw_link",
+    "left_elbow_link": "left_elbow_yaw_link", "right_elbow_link": "right_elbow_yaw_link",
+}
+
+
+def _body_idx(body_names, name):
+    if name not in body_names and _K1_EVAL_BODY_MAP.get(name) in body_names:
+        name = _K1_EVAL_BODY_MAP[name]
+    return body_names.index(name)
+
+
 def create_html_table(metrics_dict):
     """
     Create a sortable HTML table for metrics logging using DataTables.
@@ -571,12 +586,12 @@ class ImEvalCallback(TrainerCallback):
                 foot_subset_names = ["left_ankle_roll_link", "right_ankle_roll_link"]
 
                 # Get indices for subsets
-                legs_indices = [body_names.index(name) for name in legs_subset_names]
-                vr_3points_indices = [body_names.index(name) for name in vr_3points_subset_names]
+                legs_indices = [_body_idx(body_names, name) for name in legs_subset_names]
+                vr_3points_indices = [_body_idx(body_names, name) for name in vr_3points_subset_names]
                 other_upper_bodies_indices = [
-                    body_names.index(name) for name in other_upper_bodies_subset_names
+                    _body_idx(body_names, name) for name in other_upper_bodies_subset_names
                 ]
-                foot_indices = [body_names.index(name) for name in foot_subset_names]
+                foot_indices = [_body_idx(body_names, name) for name in foot_subset_names]
                 # Extract subset data
                 pred_pos_legs = [p[:, legs_indices, :] for p in self.pred_pos_all]
                 gt_pos_legs = [g[:, legs_indices, :] for g in self.gt_pos_all]

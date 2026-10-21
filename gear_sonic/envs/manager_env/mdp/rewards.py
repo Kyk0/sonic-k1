@@ -55,6 +55,7 @@ class RewardsCfg:
     energy_consumption = None
     is_terminated = None
     upright_penalty = None
+    tracking_head_joint_pos = None  # K1 head joint tracking (tracking_joint_pos_error)
 
 
 def tracking_anchor_pos_error(
@@ -605,3 +606,23 @@ def anti_shake_ang_vel_l2(
     excess = torch.relu(speed - threshold)
     penalty = (excess * excess).mean(dim=-1)
     return penalty
+
+
+def tracking_joint_pos_error(
+    env: ManagerBasedRLEnv, command_name: str, std: float, joint_names: list[str]
+) -> torch.Tensor:
+    """Gaussian reward on reference-vs-robot joint position error for a subset of joints.
+
+    Added for the Booster K1 port: the K1 has actuated head joints (aahead_yaw/pitch) that the
+    body-level rewards barely constrain (1 of 12 bodies), so the policy ignored the reference head.
+    """
+    command: TrackingCommand = env.command_manager.get_term(command_name)
+    if not hasattr(command, "_joint_reward_idx_cache"):
+        command._joint_reward_idx_cache = {}
+    key = tuple(joint_names)
+    if key not in command._joint_reward_idx_cache:
+        jn = list(command.robot.joint_names)
+        command._joint_reward_idx_cache[key] = [jn.index(n) for n in joint_names]
+    idx = command._joint_reward_idx_cache[key]
+    err = (command.joint_pos[:, idx] - command.robot_joint_pos[:, idx]) ** 2
+    return torch.exp(-err.mean(dim=-1) / (std * std))

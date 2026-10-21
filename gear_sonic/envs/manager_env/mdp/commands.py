@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from collections.abc import Sequence
 import copy
 import dataclasses
@@ -42,6 +44,18 @@ if TYPE_CHECKING:
 INACTIVE_OBJECT_BASE_OFFSET = torch.tensor([1000.0, 0.0, -50.0])  # 1km away in X, 50m underground
 INACTIVE_OBJECT_Z_SPACING = 10.0  # 10m vertical spacing between objects (must be > chair height)
 
+
+
+def _lower_joint_indices_mujoco(mapping):
+    """MuJoCo DOF indices of leg joints (hip/knee/ankle), derived from body names.
+
+    G1's MuJoCo order starts with its 12 leg joints, so this equals range(12) there;
+    robots like K1 list head/arms first, so a hard-coded range(12) would be wrong.
+    """
+    names = mapping["isaaclab_joints"]  # body names in IsaacLab order, root at 0
+    i2m = mapping["isaaclab_to_mujoco_dof"]  # i2m[mujoco_dof] = isaaclab dof index
+    legs = [j for j in range(len(i2m)) if re.search(r"hip|knee|ankle", names[i2m[j] + 1])]
+    return legs if legs else list(range(12))
 
 def _init_variable_frames(
     enabled: bool,
@@ -173,7 +187,7 @@ class TrackingCommand(CommandTerm):
 
         self.isaaclab_to_mujoco_dof = env.cfg.isaaclab_to_mujoco_mapping["isaaclab_to_mujoco_dof"]
         self.mujoco_to_isaaclab_dof = env.cfg.isaaclab_to_mujoco_mapping["mujoco_to_isaaclab_dof"]
-        self.lower_joint_indices_mujoco = list(range(12))
+        self.lower_joint_indices_mujoco = _lower_joint_indices_mujoco(env.cfg.isaaclab_to_mujoco_mapping)
         self.lower_joint_isaaclab_indices = [
             self.isaaclab_to_mujoco_dof[i] for i in self.lower_joint_indices_mujoco
         ]
@@ -669,7 +683,7 @@ class TrackingCommand(CommandTerm):
         if isaaclab_to_mujoco_mapping is not None:
             inst.isaaclab_to_mujoco_dof = isaaclab_to_mujoco_mapping["isaaclab_to_mujoco_dof"]
             inst.mujoco_to_isaaclab_dof = isaaclab_to_mujoco_mapping["mujoco_to_isaaclab_dof"]
-        inst.lower_joint_indices_mujoco = list(range(12))
+        inst.lower_joint_indices_mujoco = _lower_joint_indices_mujoco(isaaclab_to_mujoco_mapping)
         if hasattr(inst, "isaaclab_to_mujoco_dof"):
             inst.lower_joint_isaaclab_indices = [
                 inst.isaaclab_to_mujoco_dof[i] for i in inst.lower_joint_indices_mujoco
@@ -2416,6 +2430,27 @@ class TrackingCommand(CommandTerm):
         self.metrics["error_body_pos"] = torch.norm(
             self.body_pos_relative_w - self.robot_body_pos_w, dim=-1
         ).mean(dim=-1)
+        # Per-foot xy / z tracking error (logging only, no termination). Added for the K1 port.
+        if not hasattr(self, "_foot_metric_idx"):
+            names = list(self.cfg.body_names)
+            self._foot_metric_idx = {
+                side: names.index(f"{side}_ankle_roll_link")
+                for side in ("left", "right")
+                if f"{side}_ankle_roll_link" in names
+            }
+        # Head joint tracking error (logging only). K1 head: aahead_yaw_joint / aahead_pitch_joint.
+        if not hasattr(self, "_head_joint_idx"):
+            jn = list(self.robot.joint_names)
+            self._head_joint_idx = [jn.index(n) for n in ("aahead_yaw_joint", "aahead_pitch_joint") if n in jn]
+        if self._head_joint_idx:
+            hj = (self.joint_pos[:, self._head_joint_idx] - self.robot_joint_pos[:, self._head_joint_idx]).abs()
+            self.metrics["error_head_yaw"] = hj[:, 0]
+            if hj.shape[1] > 1:
+                self.metrics["error_head_pitch"] = hj[:, 1]
+        for side, i in self._foot_metric_idx.items():
+            d = self.body_pos_relative_w[:, i] - self.robot_body_pos_w[:, i]
+            self.metrics[f"error_foot_xy_{side}"] = torch.norm(d[:, :2], dim=-1)
+            self.metrics[f"error_foot_z_{side}"] = d[:, 2].abs()
         self.metrics["error_body_rot"] = quat_error_magnitude(
             self.body_quat_relative_w, self.robot_body_quat_w
         ).mean(dim=-1)

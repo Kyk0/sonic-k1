@@ -1,0 +1,178 @@
+# @package _global_
+# SONIC K1 config — 3 encoders (G1/motion tracking, teleop, SMPL) for Booster K1.
+# Based on sonic_h2.yaml but targeting K1 (22 DOF, 23 bodies, no waist, no wrists).
+# K1 has no wrist/torso_link/head_link bodies -- any G1/H2 term referencing those
+# names is overridden below to K1 equivalents (elbow_yaw as the end-of-arm point,
+# aahead_pitch_link as the head link, trunk as the root/torso stand-in).
+
+defaults:
+  - /algo: ppo_im_phc
+  - /manager_env: base_env
+  - /callbacks/read_eval
+  - /callbacks/im_resample
+  - /aux_losses: universal_token/g1_recon_and_all_latent
+  - override /trainer: trl_ppo_aux
+  - override /actor_critic: universal_token/all_mlp_v1
+  - override /manager_env/observations/tokenizer: unitoken_all_noz
+  - override /manager_env/observations/policy: local_dir_hist
+  - override /manager_env/observations/critic: privileged_mf_hist
+  - override /manager_env/events: tracking/level0_4
+  - override /manager_env/terminations: tracking/base_adaptive_strict_ori_foot_xyz
+  - override /manager_env/rewards: tracking/base_5point_local_feet_acc
+
+use_manager_env: true
+
+exp_base: ${hydra:runtime.choices.exp}
+exp_var: test
+experiment_name: ${exp_base}_${exp_var}
+experiment_dir: ${base_dir}/${project_name}/${experiment_name}-${timestamp}
+
+num_envs: 4096
+project_name: TRL_K1_Track
+
+actor_prop_history_length: 10
+actor_actions_history_length: 10
+
+critic_prop_history_length: 10
+critic_actions_history_length: 10
+
+manager_env:
+  observations:
+    tokenizer:
+      joint_pos_multi_future_wrist_for_smpl:
+        params:
+          # K1 has no wrists; reuse the two elbow_yaw joints (most distal arm DOF,
+          # IsaacLab order indices 14/15 -- see k1.py K1_ISAACLAB_JOINTS) duplicated
+          # to fill the 6-slot shape the SMPL encoder input expects. Crude smoke-test
+          # stand-in, not a real wrist signal -- revisit if upper-body tracking is poor.
+          joints_idx: [14, 15, 14, 15, 14, 15]
+  rewards:
+    # K1 head: explicit joint tracking (body-level rewards alone left the head untracked; err ~= ref std 0.2 rad)
+    tracking_head_joint_pos:
+      _target_: isaaclab.managers.RewardTermCfg
+      func: gear_sonic.envs.manager_env.mdp:tracking_joint_pos_error
+      weight: 1.0
+      params:
+        command_name: "motion"
+        std: 0.25
+        joint_names: ["aahead_yaw_joint", "aahead_pitch_joint"]
+    feet_acc:
+      weight: -2.5e-6
+    anti_shake_ang_vel:
+      params:
+        body_names: ["left_elbow_yaw_link", "right_elbow_yaw_link", "aahead_pitch_link"]
+    undesired_contacts:
+      params:
+        sensor_cfg:
+          body_names:
+            - "^(?!left_ankle_roll_link$)(?!right_ankle_roll_link$)(?!left_elbow_yaw_link$)(?!right_elbow_yaw_link$).+$"
+  terminations:
+    ee_body_pos:
+      params:
+        body_names:
+          - "left_ankle_roll_link"
+          - "right_ankle_roll_link"
+          - "left_elbow_yaw_link"
+          - "right_elbow_yaw_link"
+  events:
+    # K1 (19.7 kg, 0.93 m) vs G1: domain randomization scaled down (approved 2026-10-13)
+    randomize_rigid_body_mass:
+      params:
+        asset_cfg:
+          body_names: "left_elbow_yaw_link|right_elbow_yaw_link|trunk"
+        mass_distribution_params: [0.9, 1.3]   # G1: [0.8, 2.5] (+~50% robot mass on K1)
+    base_com:
+      params:
+        asset_cfg:
+          body_names: "trunk"
+        com_range: {x: [-0.0175, 0.0175], y: [-0.035, 0.035], z: [-0.035, 0.035]}   # G1 x0.7
+    push_robot:
+      params:
+        velocity_range: {x: [-0.35, 0.35], y: [-0.35, 0.35], z: [-0.14, 0.14], roll: [-0.36, 0.36], pitch: [-0.36, 0.36], yaw: [-0.55, 0.55]}   # G1 x0.7
+  config:
+    robot:
+      type: k1
+    terrain_type: trimesh
+  commands:
+    motion:
+      anchor_body: "trunk"
+      body_names: [
+        "trunk",
+        "left_hip_roll_link",
+        "left_knee_pitch_link",
+        "left_ankle_roll_link",
+        "right_hip_roll_link",
+        "right_knee_pitch_link",
+        "right_ankle_roll_link",
+        "left_shoulder_roll_link",
+        "left_elbow_yaw_link",
+        "right_shoulder_roll_link",
+        "right_elbow_yaw_link",
+        "aahead_pitch_link",   # K1 has an actuated head (G1 does not): track it, else head yaw/pitch are unrewarded
+      ]
+      # K1: real head link instead of G1's trunk + 0.5 m proxy. Order must match SONIC's (left hand, right hand, head);
+      # the old K1 order (trunk, l, r) put the G1 head offset (0.35 m up) on the right elbow.
+      vr_3point_body: ["left_elbow_yaw_link", "right_elbow_yaw_link", "aahead_pitch_link"]
+      vr_3point_body_offset: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+      reward_point_body: ["aahead_pitch_link", "left_elbow_yaw_link", "right_elbow_yaw_link"]
+      reward_point_body_offset: [[0.0, 0.0, 0.0], [0.0, -0.0, 0.0], [0.0, -0.0, 0.0]]
+      num_future_frames: 10
+      dt_future_ref_frames: 0.1
+      smpl_num_future_frames: 10
+      smpl_dt_future_ref_frames: 0.02
+      cat_upper_body_poses: true
+      cat_upper_body_poses_prob: 0.5
+
+      freeze_frame_aug: true
+      teleop_sample_prob_when_smpl: 0.5
+
+      motion_lib_cfg:
+        adaptive_sampling:
+          adp_samp_failure_rate_max_over_mean: 200
+        motion_file: null
+        smpl_motion_file: dummy
+        smpl_y_up: true
+        asset:
+          assetFileName: "k1.xml"
+
+algo:
+  config:
+    # K1 from scratch on 1 GPU: SONIC default 0.05 throttles the KL-adaptive lr to ~7e-5 (standing clip barely learns);
+    # 0.5 (= std_clamp_max) matches BeyondMimic-style learning speed. A/B 2026-10-13.
+    init_noise_std: 0.5
+    empty_cache_every_n_ppo_epoch: -1
+    num_steps_per_env: 24
+    use_clampped_std: true
+    std_clamp_min: 0.001
+    std_clamp_max: 0.5
+    max_grad_norm: 0.1
+    actor:
+      backbone:
+        reencode_smpl_g1_recon: true
+        encoders:
+          g1:
+            inputs: ["command_multi_future_nonflat", "motion_anchor_ori_b_mf_nonflat"]
+          teleop:
+            inputs:
+              [
+                "command_multi_future_lower_body",
+                "vr_3point_local_target",
+                "vr_3point_local_orn_target",
+                "motion_anchor_ori_b",
+              ]
+          smpl:
+            inputs:
+              [
+                "smpl_joints_multi_future_local_nonflat",
+                "smpl_root_ori_b_multi_future",
+                "joint_pos_multi_future_wrist_for_smpl",
+              ]
+        decoders:
+          g1_kin:
+            outputs: ["command_multi_future_nonflat", "motion_anchor_ori_b_mf_nonflat"]
+
+    critic:
+      backbone:
+        module_config_dict:
+          layer_config:
+            hidden_dims: [2048, 2048, 1024, 1024, 512, 512]
