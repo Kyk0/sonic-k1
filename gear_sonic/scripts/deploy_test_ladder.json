@@ -1,0 +1,598 @@
+{
+ "1 stand / upper body": [
+  {
+   "clip": "neutral_stoop_down_R_003__A087_M",
+   "start_dev_rad": 0.09,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 17.1
+  },
+  {
+   "clip": "neutral_confusion_R_001__A543",
+   "start_dev_rad": 0.11,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 10.2
+  },
+  {
+   "clip": "yawn_R_003__A167_M",
+   "start_dev_rad": 0.12,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 7.2
+  },
+  {
+   "clip": "neutral_cry_standing_R_001__A543_M",
+   "start_dev_rad": 0.13,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 7.1
+  },
+  {
+   "clip": "neutral_stoop_down_R_003__A088",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.13,
+   "worst_mpjpe_l": 21.5
+  },
+  {
+   "clip": "neutral_itching_head_R_001__A545",
+   "start_dev_rad": 0.2,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 8.8
+  },
+  {
+   "clip": "eat_icecream_fall_standing_R_001__A459_M",
+   "start_dev_rad": 0.22,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 7.4
+  },
+  {
+   "clip": "drinking_bottle_idle_to_idle_R_001__A551_M",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 8.1
+  },
+  {
+   "clip": "street_crowd_talking_cellphone_R_003__A432",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 8.3
+  },
+  {
+   "clip": "crossed_arms_idle_R_001__A457",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 38.2
+  },
+  {
+   "clip": "crossed_arms_idle_R_002__A549",
+   "start_dev_rad": 0.27,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 11.0
+  },
+  {
+   "clip": "hurry_idle_right_R_001__A328",
+   "start_dev_rad": 0.3,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 7.7
+  }
+ ],
+ "2 walk": [
+  {
+   "clip": "neutral_walk_180_R_001__A075_M",
+   "start_dev_rad": 0.1,
+   "start_speed": 0.07,
+   "worst_mpjpe_l": 18.5
+  },
+  {
+   "clip": "neutral_walk_180_R_002__A121",
+   "start_dev_rad": 0.11,
+   "start_speed": 0.06,
+   "worst_mpjpe_l": 20.9
+  },
+  {
+   "clip": "neutral_walk_180_R_001__A084",
+   "start_dev_rad": 0.13,
+   "start_speed": 0.03,
+   "worst_mpjpe_l": 17.8
+  },
+  {
+   "clip": "neutral_walk_180_R_003__A084_M",
+   "start_dev_rad": 0.13,
+   "start_speed": 0.08,
+   "worst_mpjpe_l": 17.0
+  },
+  {
+   "clip": "walk_180_R_002__A332",
+   "start_dev_rad": 0.13,
+   "start_speed": 0.06,
+   "worst_mpjpe_l": 20.8
+  },
+  {
+   "clip": "walk_180_R_001__A346",
+   "start_dev_rad": 0.14,
+   "start_speed": 0.11,
+   "worst_mpjpe_l": 17.1
+  },
+  {
+   "clip": "neutral_walk_180_R_003__A083",
+   "start_dev_rad": 0.16,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 17.1
+  },
+  {
+   "clip": "sweep_floor_side_walk_R_001__A330",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 21.5
+  },
+  {
+   "clip": "walk_180_R_002__A346",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 15.9
+  },
+  {
+   "clip": "neutral_walk_180_R_004__A102",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 20.0
+  },
+  {
+   "clip": "neutral_avoid_obstacle_bend_down_walk_ff_180_R_001__A542_M",
+   "start_dev_rad": 0.18,
+   "start_speed": 0.03,
+   "worst_mpjpe_l": 17.5
+  },
+  {
+   "clip": "neutral_walk_ff_360_R_002__A534_M",
+   "start_dev_rad": 0.21,
+   "start_speed": 0.19,
+   "worst_mpjpe_l": 16.3
+  },
+  {
+   "clip": "neutral_walk_180_R_003__A077_M",
+   "start_dev_rad": 0.22,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 17.3
+  },
+  {
+   "clip": "walking_random_direction_R_001__A430_M",
+   "start_dev_rad": 0.23,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 19.2
+  },
+  {
+   "clip": "neutral_walk_180_R_002__A118",
+   "start_dev_rad": 0.23,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 16.1
+  },
+  {
+   "clip": "walk_180_R_003__A347",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.08,
+   "worst_mpjpe_l": 19.8
+  },
+  {
+   "clip": "walk_180_R_003__A334_M",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 20.8
+  },
+  {
+   "clip": "walk_180_R_003__A331",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.06,
+   "worst_mpjpe_l": 20.6
+  },
+  {
+   "clip": "neutral_walk_180_R_002__A077_M",
+   "start_dev_rad": 0.27,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 21.0
+  },
+  {
+   "clip": "neutral_walk_180_R_002__A097",
+   "start_dev_rad": 0.28,
+   "start_speed": 0.1,
+   "worst_mpjpe_l": 19.1
+  },
+  {
+   "clip": "walk_180_R_002__A331_M",
+   "start_dev_rad": 0.29,
+   "start_speed": 0.08,
+   "worst_mpjpe_l": 17.8
+  }
+ ],
+ "3 jog / turn": [
+  {
+   "clip": "jog_in_place_increasing_speed_back_up_squat_R_001__A493_M",
+   "start_dev_rad": 0.08,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 19.8
+  },
+  {
+   "clip": "jog_in_place_increasing_speed_back_up_squat_R_001__A495_M",
+   "start_dev_rad": 0.09,
+   "start_speed": 0.07,
+   "worst_mpjpe_l": 20.1
+  },
+  {
+   "clip": "neutral_turning_around_R_001__A098_M",
+   "start_dev_rad": 0.14,
+   "start_speed": 0.16,
+   "worst_mpjpe_l": 18.1
+  },
+  {
+   "clip": "neutral_jog_ff_270_R_001__A535",
+   "start_dev_rad": 0.14,
+   "start_speed": 0.07,
+   "worst_mpjpe_l": 22.2
+  },
+  {
+   "clip": "turn_run_270_R_003__A335",
+   "start_dev_rad": 0.14,
+   "start_speed": 0.09,
+   "worst_mpjpe_l": 33.6
+  },
+  {
+   "clip": "jog_ff_start_180_R_001__A502",
+   "start_dev_rad": 0.16,
+   "start_speed": 0.05,
+   "worst_mpjpe_l": 23.5
+  },
+  {
+   "clip": "turn_run_270_R_001__A332",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 26.0
+  },
+  {
+   "clip": "crossed_arms_idle_turn_000_R_002__A458",
+   "start_dev_rad": 0.18,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 24.3
+  },
+  {
+   "clip": "idle_turn_045_R_long_001__A551_M",
+   "start_dev_rad": 0.2,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 17.6
+  },
+  {
+   "clip": "idle_turn_000_R_long_003__A551",
+   "start_dev_rad": 0.21,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 20.6
+  },
+  {
+   "clip": "idle_turn_090_R_long_001__A550",
+   "start_dev_rad": 0.23,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 14.3
+  },
+  {
+   "clip": "neutral_turning_around_R_001__A119",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.07,
+   "worst_mpjpe_l": 14.7
+  },
+  {
+   "clip": "idle_turn_135_R_long_001__A550_M",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 14.4
+  },
+  {
+   "clip": "neutral_jog_ff_270_R_001__A536",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 22.9
+  },
+  {
+   "clip": "idle_turn_090_R_long_002__A551",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 18.1
+  },
+  {
+   "clip": "idle_turn_045_R_long_001__A551",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 18.7
+  },
+  {
+   "clip": "neutral_turning_around_R_003__A118",
+   "start_dev_rad": 0.29,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 11.9
+  },
+  {
+   "clip": "hurry_idle_hurry_turn_360_002__A148",
+   "start_dev_rad": 0.3,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 17.0
+  },
+  {
+   "clip": "turn_run_360_R_003__A334_M",
+   "start_dev_rad": 0.3,
+   "start_speed": 0.07,
+   "worst_mpjpe_l": 35.5
+  }
+ ],
+ "4 athletic / other": [
+  {
+   "clip": "throw_ball_R_002__A345",
+   "start_dev_rad": 0.07,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 12.5
+  },
+  {
+   "clip": "body_check_001__A489",
+   "start_dev_rad": 0.1,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 7.7
+  },
+  {
+   "clip": "threatening_R_003__A103",
+   "start_dev_rad": 0.1,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 6.7
+  },
+  {
+   "clip": "body_check_001__A472_M",
+   "start_dev_rad": 0.11,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 8.4
+  },
+  {
+   "clip": "on_the_edge_003__A143_M",
+   "start_dev_rad": 0.11,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 27.6
+  },
+  {
+   "clip": "throw_ball_R_001__A346_M",
+   "start_dev_rad": 0.11,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 15.2
+  },
+  {
+   "clip": "egypt_dance_R_003__A186_M",
+   "start_dev_rad": 0.12,
+   "start_speed": 0.13,
+   "worst_mpjpe_l": 23.6
+  },
+  {
+   "clip": "threatening_R_002__A104_M",
+   "start_dev_rad": 0.13,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 12.9
+  },
+  {
+   "clip": "sneeze_R_001__A104",
+   "start_dev_rad": 0.13,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 9.5
+  },
+  {
+   "clip": "body_check_001__A490_M",
+   "start_dev_rad": 0.13,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 7.2
+  },
+  {
+   "clip": "sneeze_R_002__A104_M",
+   "start_dev_rad": 0.15,
+   "start_speed": 0.03,
+   "worst_mpjpe_l": 8.7
+  },
+  {
+   "clip": "threatening_R_001__A104_M",
+   "start_dev_rad": 0.15,
+   "start_speed": 0.06,
+   "worst_mpjpe_l": 14.2
+  },
+  {
+   "clip": "egypt_dance_R_001__A167_M",
+   "start_dev_rad": 0.15,
+   "start_speed": 0.04,
+   "worst_mpjpe_l": 20.5
+  },
+  {
+   "clip": "egypt_dance_R_002__A188",
+   "start_dev_rad": 0.16,
+   "start_speed": 0.08,
+   "worst_mpjpe_l": 21.5
+  },
+  {
+   "clip": "threatening_R_001__A102",
+   "start_dev_rad": 0.16,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 14.0
+  },
+  {
+   "clip": "take_a_sip_360_start_R_001__A548",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 17.1
+  },
+  {
+   "clip": "egypt_dance_R_004__A142_M",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.08,
+   "worst_mpjpe_l": 23.1
+  },
+  {
+   "clip": "dancing_routine_V002_003__A458_M",
+   "start_dev_rad": 0.17,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 14.4
+  },
+  {
+   "clip": "on_the_edge_002__A237",
+   "start_dev_rad": 0.18,
+   "start_speed": 0.09,
+   "worst_mpjpe_l": 19.4
+  },
+  {
+   "clip": "dancing_routine_V002_003__A458",
+   "start_dev_rad": 0.18,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 12.9
+  },
+  {
+   "clip": "body_check_002__A459",
+   "start_dev_rad": 0.18,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 6.6
+  },
+  {
+   "clip": "body_check_002__A459_M",
+   "start_dev_rad": 0.18,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 7.8
+  },
+  {
+   "clip": "brush_of_dust_001__A052_M",
+   "start_dev_rad": 0.19,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 9.7
+  },
+  {
+   "clip": "body_check_001__A400",
+   "start_dev_rad": 0.19,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 8.8
+  },
+  {
+   "clip": "egypt_dance_R_003__A142",
+   "start_dev_rad": 0.19,
+   "start_speed": 0.03,
+   "worst_mpjpe_l": 20.4
+  },
+  {
+   "clip": "dancing_routine_V002_001__A418",
+   "start_dev_rad": 0.21,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 18.4
+  },
+  {
+   "clip": "on_the_edge_003__A235_M",
+   "start_dev_rad": 0.21,
+   "start_speed": 0.1,
+   "worst_mpjpe_l": 21.5
+  },
+  {
+   "clip": "throw_ball_R_002__A347_M",
+   "start_dev_rad": 0.21,
+   "start_speed": 0.03,
+   "worst_mpjpe_l": 16.3
+  },
+  {
+   "clip": "zoidberg_scuttle_R_001__A528_M",
+   "start_dev_rad": 0.21,
+   "start_speed": 0.06,
+   "worst_mpjpe_l": 34.0
+  },
+  {
+   "clip": "exercise_2_001__A120_M",
+   "start_dev_rad": 0.21,
+   "start_speed": 0.04,
+   "worst_mpjpe_l": 22.5
+  },
+  {
+   "clip": "shoulder_clap_R_001__A243",
+   "start_dev_rad": 0.22,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 7.0
+  },
+  {
+   "clip": "shoulder_clap_R_001__A243_M",
+   "start_dev_rad": 0.22,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 6.8
+  },
+  {
+   "clip": "egypt_dance_R_003__A187_M",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.08,
+   "worst_mpjpe_l": 17.1
+  },
+  {
+   "clip": "shoulder_clap_R_004__A239",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 7.6
+  },
+  {
+   "clip": "peeling_vegetables_R_002__A288",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 6.9
+  },
+  {
+   "clip": "heavy_item_cupboard_high_in_R_002__A284",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 17.5
+  },
+  {
+   "clip": "on_the_edge_001__A236",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.03,
+   "worst_mpjpe_l": 14.3
+  },
+  {
+   "clip": "shoulder_clap_R_003__A243_M",
+   "start_dev_rad": 0.24,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 7.9
+  },
+  {
+   "clip": "dancing_routine_V002_001__A468",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 16.5
+  },
+  {
+   "clip": "macarena_001__A545_M",
+   "start_dev_rad": 0.26,
+   "start_speed": 0.04,
+   "worst_mpjpe_l": 16.0
+  },
+  {
+   "clip": "rage_professionall_001__A001",
+   "start_dev_rad": 0.27,
+   "start_speed": 0.0,
+   "worst_mpjpe_l": 22.3
+  },
+  {
+   "clip": "threatening_002__A024_M",
+   "start_dev_rad": 0.27,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 10.3
+  },
+  {
+   "clip": "egypt_dance_R_003__A167_M",
+   "start_dev_rad": 0.27,
+   "start_speed": 0.09,
+   "worst_mpjpe_l": 23.1
+  },
+  {
+   "clip": "on_the_edge_003__A236_M",
+   "start_dev_rad": 0.27,
+   "start_speed": 0.07,
+   "worst_mpjpe_l": 15.5
+  },
+  {
+   "clip": "rage_professionall_003__A001_M",
+   "start_dev_rad": 0.29,
+   "start_speed": 0.01,
+   "worst_mpjpe_l": 19.1
+  },
+  {
+   "clip": "injured_torso_kick_trash_R_003__A338",
+   "start_dev_rad": 0.29,
+   "start_speed": 0.02,
+   "worst_mpjpe_l": 16.1
+  }
+ ]
+}
