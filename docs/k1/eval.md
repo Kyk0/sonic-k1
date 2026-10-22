@@ -71,14 +71,28 @@ harder clips than the unseen-200, which is why seen scores lower here.
 
 Success without a fall on unseen motions. Other methods run on the Unitree G1 as published, with their own retargeting and protocols.
 
+All rows use the SONIC paper's success rule: a rollout fails if the root or an end-effector height deviates by more than 0.25 m. Ours are in MuJoCo with `--no-terminate`.
+
 | Benchmark | **SONIC-K1** (ours, K1) | SONIC (G1) | BeyondMimic (G1) | Any2Track (G1) |
 |---|---|---|---|---|
-| PHUMA (MuJoCo) | **97.3%** | 97.2% | 73.8% | 78.5% |
-| Held-out mocap (ours: 1,985 Bones-SEED; SONIC: in-house test-content) | **98.7%** | 98.5% | 82.0% | 61.6% |
-| LAFAN1 (MuJoCo) | **84.6%** | 85.0% | 87.5% | 100%† |
+| PHUMA (1,758 clips, G1→K1) | **93.6%** | 97.2% | 73.8% | 78.5% |
+| Held-out mocap (ours: 1,985 Bones-SEED; SONIC: in-house test-content) | **97.4%** | 98.5% | 82.0% | 61.6% |
 
-Sources: SONIC (Luo et al., arXiv 2511.07820) for PHUMA and held-out; GenTrack (arXiv 2608.01410, Tab. 1) for LAFAN1, with a 0.25 m pelvis-height rule. †Any2Track trains on LAFAN1.
+Sources: the SONIC paper (Luo et al., arXiv 2511.07820). The other methods run on the Unitree G1 with their own data and retargeting, so this comparison is indicative.
 SONIC-K1 is the first open-weights general motion-tracking model for the Booster K1.
+
+## All four success rules (MuJoCo, it50000, `--no-terminate`; metrics over each rule's successful clips; MPJPE-L over K1's 12 links)
+| Set | Clips | SONIC rule (root/EE height 0.25 m) | No-fall (root height 0.25 m + tilt 1 rad) | Official-like | PHC 0.5 m |
+|---|---|---|---|---|---|
+| Bones held-out, 10 s | 1,985 | **97.4%** | 98.4% | 91.9% | 86.6% |
+| PHUMA (G1→K1) | 1,758 | **93.6%** | 97.3% | 85.0% | 91.7% |
+| 100STYLE (100 styles × walk/run, 20 s) | 200 | **99.0%** | 98.5% | 77.0% | 51.5% |
+| LAFAN1, all 10 s windows | 1,390 | 70.6% | 75.5% | 45.0% | 39.9% |
+| LAFAN1, locomotion windows (walk/run/sprint/aiming/dance/jumps) | 792 | 91.9% | — | — | — |
+| LAFAN1, full clips (1–4 min) | 65 | 18.5% | 27.7% | 0% | 0% |
+
+Under the SONIC rule: Bones MPJPE-L 15.4 / PA 11.8 mm, E_vel 2.65 mm/frame, E_acc 0.98 mm/frame²; PHUMA 22.4 / 15.9, 3.15 / 0.86; LAFAN1 windows 31.9 / 21.5, 5.62 / 1.76.
+The LAFAN1 categories that need floor contact or props (fallAndGetUp 4.2%, obstacles 36.5%, ground 53.7%) account for most LAFAN1 failures.
 
 ## External benchmarks (MuJoCo, it50000, zero-shot)
 | Benchmark | Clips | Paper-style | Official-like | PHC 0.5 m | MPJPE-L | PA | Notes |

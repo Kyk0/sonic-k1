@@ -10,7 +10,6 @@ One policy, thousands of human motions, trained from scratch with under 1% of SO
   <img src="https://img.shields.io/badge/sim2sim-Isaac%20→%20MuJoCo-green">
 </p>
 
-<!-- HERO: replace with media/hero.webp (or a GitHub-hosted mp4) once rendered -->
 <p align="center"><img src="docs/k1/media/hero.webp" width="100%"></p>
 
 <p align="center">
@@ -27,18 +26,19 @@ One policy, thousands of human motions, trained from scratch with under 1% of SO
 
 | | Unseen (1,985 clips) | Seen (2,000 clips) |
 |---|---|---|
-| Success, official repo eval | **93.1%** | 98.5% |
-| Success, SONIC paper rule (falls only) | **98.7%** | 98.8% |
+| Success, SONIC's rule (root or end-effector height off > 0.25 m; MuJoCo) | **97.4%** | — |
+| Success, no-fall rule (root height + tilt; Isaac) | **98.7%** | 98.8% |
+| Success, strict repo eval (adds foot-position limit; Isaac) | 93.1% | 98.5% |
 | MPJPE-L / PA-MPJPE | **14.7 / 10.8 mm** | 15.2 / 11.2 mm |
 
-Isaac Lab, 10 s windows, deterministic. Hold-out split of Bones-SEED. Full protocol: [`docs/k1/eval.md`](docs/k1/eval.md).
+10 s windows, deterministic. Hold-out split of Bones-SEED. Full protocol: [`docs/k1/eval.md`](docs/k1/eval.md).
 
-**How it compares** (success without a fall on unseen motions; others as published on the Unitree G1, so this is indicative):
+**How it compares** (SONIC's own success rule, root or end-effector height off by > 0.25 m; others as published on the Unitree G1, so this is indicative):
 
 | Benchmark | **SONIC-K1** (ours, K1) | SONIC (G1) | BeyondMimic (G1) | Any2Track (G1) |
 |---|---|---|---|---|
-| PHUMA | **97.3%** | 97.2% | 73.8% | 78.5% |
-| Held-out mocap | **98.7%** | 98.5% | 82.0% | 61.6% |
+| PHUMA | **93.6%** | 97.2% | 73.8% | 78.5% |
+| Held-out mocap | **97.4%** | 98.5% | 82.0% | 61.6% |
 
 Details and LAFAN1 are in [`docs/k1/eval.md`](docs/k1/eval.md).
 
@@ -46,9 +46,9 @@ Details and LAFAN1 are in [`docs/k1/eval.md`](docs/k1/eval.md).
 
 | | SONIC (G1, paper) | SONIC-K1 |
 |---|---|---|
-| GPU-hours | ~9,000 | **~100** |
+| GPU-hours | >9,000 | **~100** |
 | Training motions | ~100M frames (700 h) | 9,991 clips |
-| Unseen success (fall rule) | — | 98.7% (Isaac), 99.0% (MuJoCo) |
+| Unseen success, SONIC's rule | 98.5% (in-house test set) | 97.4% (MuJoCo) |
 
 
 ## Get started
