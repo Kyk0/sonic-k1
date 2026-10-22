@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use SONIC-K1, please cite it and the original SONIC paper."
 title: "SONIC-K1: Whole-Body Motion Tracking for the Booster K1 Humanoid"
 version: 0.1.0
-date-released: 2026-10-XX
+date-released: 2026-10-21
 authors:
   - family-names: "Kolesnichenko"
     given-names: "Kyrylo"
