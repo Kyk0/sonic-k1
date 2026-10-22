@@ -57,13 +57,15 @@ Details and LAFAN1 are in [`docs/k1/eval.md`](docs/k1/eval.md).
 
 ## Try it in 2 minutes (laptop, no GPU)
 ```bash
-GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 https://github.com/Kyk0/sonic-k1 && cd sonic-k1
+GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --filter=blob:none --sparse https://github.com/Kyk0/sonic-k1 && cd sonic-k1
+git sparse-checkout set gear_sonic/scripts examples/k1 gear_sonic/data/assets/robot_description   # ~30 MB instead of ~1 GB
 pip install mujoco onnxruntime numpy "imageio[ffmpeg]" huggingface_hub     # Python 3.10+
 hf download Kyry10/sonic-k1 onnx/policy_g1.onnx k1_plant.json --local-dir checkpoints/sonic-k1
 
 python gear_sonic/scripts/play_k1.py                                         # live viewer (macOS: use mjpython)
 python gear_sonic/scripts/play_k1.py --motion examples/k1/motions/zombie_walk.npz --record zombie.mp4
 ```
+For training or the full benchmarks, clone the whole repo (`git clone https://github.com/Kyk0/sonic-k1`) instead.
 The first command opens a MuJoCo window with the K1 doing a penguin walk. The second one saves a video you can share.
 Six sample motions ship in [`examples/k1/motions/`](examples/k1/motions/): `penguin_walk`, `zombie_walk`, `robot_walk`,
 `chicken_walk`, `dinosaur_walk`, `superman_walk`. They are K1 retargets of the [100STYLE](https://doi.org/10.5281/zenodo.8127870)
