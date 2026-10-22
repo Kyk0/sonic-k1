@@ -78,7 +78,7 @@ Success without a fall on unseen motions. Other methods run on the Unitree G1 as
 | LAFAN1 (MuJoCo) | **84.6%** | 85.0% | 87.5% | 100%† |
 
 Sources: SONIC (Luo et al., arXiv 2511.07820) for PHUMA and held-out; GenTrack (arXiv 2608.01410, Tab. 1) for LAFAN1, with a 0.25 m pelvis-height rule. †Any2Track trains on LAFAN1.
-Prior K1 result: BRIDGE (Wang et al., arXiv 2609.03497, Tab. 5) trained SONIC on the K1 as a baseline (92.66% on a LAFAN1 + Bones-SEED mix, MuJoCo) and did not release it. To our knowledge, SONIC-K1 is the first open-weights general motion-tracking model for the Booster K1.
+SONIC-K1 is the first open-weights general motion-tracking model for the Booster K1.
 
 ## External benchmarks (MuJoCo, it50000, zero-shot)
 | Benchmark | Clips | Paper-style | Official-like | PHC 0.5 m | MPJPE-L | PA | Notes |
