@@ -675,6 +675,10 @@ def clip_metrics(r: dict, dt: float = CONTROL_DT) -> dict:
         "first_fire": {k: v for k, v in off.items()},
     }
     res.update(_body_metrics(r["body"], r["ref_body"]))
+    # PHC-style rule: fail if the mean (global) body-position deviation ever exceeds 0.5 m
+    dev = np.linalg.norm(r["body"] - r["ref_body"], axis=-1).mean(-1) if n else np.zeros(1)
+    res["phc_success"] = bool(r["result"] == "time_out" and dev.max() <= 0.5)
+    res["max_mean_body_dev_m"] = float(dev.max())
     if off_step is not None:     # same metrics truncated where the official im_eval would stop
         res.update({f"{k}_official": v for k, v in _body_metrics(r["body"][:off_step], r["ref_body"][:off_step]).items()})
     else:
@@ -747,6 +751,7 @@ def aggregate(per_clip: list[dict]) -> dict:
     agg = {"num_clips": len(per_clip),
            "success_rate_paper": len(succ) / max(1, len(per_clip)),
            "success_rate_official": len(osucc) / max(1, len(per_clip)),
+           "success_rate_phc": sum(r.get("phc_success", False) for r in per_clip) / max(1, len(per_clip)),
            "fail_reasons": {k: sum(r["result"] == k for r in per_clip) for k in ("anchor_pos", "anchor_ori_full")},
            "official_first_fire": {k: sum(r["first_fire"][k] is not None and r["first_fire"][k] == r["official_fail_step"]
                                           for r in per_clip) for k in per_clip[0]["first_fire"]} if per_clip else {}}
@@ -760,6 +765,7 @@ def print_table(agg: dict, title: str):
     a = agg["all"]
     print(f"\n=== {title} ({agg['num_clips']} clips) ===")
     print(f"success paper-style  : {100 * agg['success_rate_paper']:.1f}%   survival {100 * a['survival']:.1f}%")
+    print(f"success PHC-style    : {100 * agg['success_rate_phc']:.1f}%   (paper-style and mean body deviation <= 0.5 m)")
     print(f"success official-like: {100 * agg['success_rate_official']:.1f}%   survival {100 * a['official_survival']:.1f}%"
           f"   first check fired: {agg['official_first_fire']}")
     rows = [("MPJPE-G (mm)", "mpjpe_g"), ("MPJPE-L (mm)", "mpjpe_l"), ("PA-MPJPE (mm)", "mpjpe_pa"),
