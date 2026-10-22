@@ -2,7 +2,7 @@ NOTICE
 
 This is a modified version of NVlabs/GR00T-WholeBodyControl (Apache-2.0),
 https://github.com/NVlabs/GR00T-WholeBodyControl (base: v1.1, commit a0732b6),
-with Booster K1 support added by Kyrylo Kolesnichenko, Kent State University, 2026.
+with Booster K1 support added by Kyrylo Kolesnichenko, ATR Lab, 2026.
 
 The upstream LICENSE (Apache-2.0 for source code; NVIDIA Open Model License for NVIDIA's model weights)
 and the files in legal/ apply unchanged to all upstream code. The SONIC-K1 policy weights were trained

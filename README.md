@@ -1,5 +1,5 @@
 <h1 align="center">SONIC-K1</h1>
-<p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights general motion tracker for the K1.<br>
+<p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights general motion tracker for the K1, built for small humanoids.<br>
 One policy, thousands of human motions, trained from scratch with under 1% of SONIC's compute.</p>
 
 <p align="center">
@@ -78,6 +78,8 @@ python gear_sonic/train_agent_trl.py \
     num_envs=16384 headless=True \
     ++manager_env.commands.motion.motion_lib_cfg.motion_file=<path/to/k1_motion_lib>
 ```
+Training on headless H100 servers? SONIC-K1 was trained with the setup in our [Isaac Lab on H100 guide](https://github.com/Kyk0/isaaclab-h100): physics-only Isaac Lab on shared, compute-only GPUs. A pre-converted K1 USD (the exact asset used for training) is at [Kyry10/booster-k1-usd](https://huggingface.co/datasets/Kyry10/booster-k1-usd).
+
 You need your own access to [Bones-SEED](https://huggingface.co/datasets/bones-studio/seed). We do **not** redistribute
 any motion data, raw or retargeted. See [`docs/k1/data.md`](docs/k1/data.md) for the retarget → QA → feasibility pipeline.
 
@@ -94,14 +96,12 @@ any motion data, raw or retargeted. See [`docs/k1/data.md`](docs/k1/data.md) for
 
 See [`NOTICE`](NOTICE) for the complete list of modified files.
 
-## Notes
-- Validated in simulation (Isaac Lab + MuJoCo sim-to-sim). Real-K1 deployment is next; on hardware, start on a gantry.
-- Use the robot-motion encoder with K1 joint-space references.
-
-## Roadmap
-- [ ] Real-K1 deployment (Booster SDK)
-- [ ] Scale to 62K clips
-- [ ] Video → K1 encoder
+## Coming soon
+- 🤖 **Real Booster K1 runs**: the policy on hardware, with videos
+- 🥽 **Whole-body teleoperation**: drive the K1 live from a VR headset
+- 🎮 **Deployment controller**: an open runtime for the Booster SDK
+- 🎥 **Video → K1**: SMPL/video input, so you can film a move and the K1 does it
+- 📈 **A bigger model**: trained on 62K motions (6× more)
 
 ## License and credits
 - Code: Apache-2.0 (upstream NVIDIA license kept; our changes are listed in `NOTICE`).
@@ -113,4 +113,4 @@ See [`NOTICE`](NOTICE) for the complete list of modified files.
 Built on [SONIC](https://arxiv.org/abs/2511.07820) by NVIDIA GEAR. Please cite it (and this repo, through
 [`docs/k1/CITATION.cff`](docs/k1/CITATION.cff)) if this helps your work.
 
-Made by [Kyrylo Kolesnichenko](https://kyry.me) at Kent State University.
+Made by [Kyrylo Kolesnichenko](https://kyry.me) at ATR Lab.

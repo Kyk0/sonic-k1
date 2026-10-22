@@ -6,7 +6,7 @@ date-released: 2026-10-22
 authors:
   - family-names: "Kolesnichenko"
     given-names: "Kyrylo"
-    affiliation: "Kent State University"
+    affiliation: "ATR Lab"
 repository-code: "https://github.com/Kyk0/sonic-k1"
 url: "https://huggingface.co/Kyry10/sonic-k1"
 license: Apache-2.0
