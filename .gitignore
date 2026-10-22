@@ -215,6 +215,7 @@ logs_eval/
 
 # Model checkpoints directory
 models/
+checkpoints/
 
 # Downloaded from HuggingFace (hf download)
 sample_data/

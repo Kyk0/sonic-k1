@@ -2,9 +2,11 @@
 <p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights general motion tracker for the K1, built for small humanoids.<br>
 One policy, thousands of human motions, trained from scratch with under 1% of SONIC's compute.</p>
 
+<p align="center"><b><a href="https://kyry.me/sonic-k1/">🌐 Project page &amp; videos</a> · <a href="#try-it-in-2-minutes-laptop-no-gpu">▶ Try it in 2 minutes</a></b></p>
+
 <p align="center">
   <a href="https://huggingface.co/Kyry10/sonic-k1"><img src="https://img.shields.io/badge/🤗%20weights-Kyry10%2Fsonic--k1-yellow"></a>
-  <a href="https://kyk0.github.io/sonic-k1/"><img src="https://img.shields.io/badge/project-page-8fe04a"></a>
+  <a href="https://kyry.me/sonic-k1/"><img src="https://img.shields.io/badge/project-page-8fe04a"></a>
   <a href="https://arxiv.org/abs/2511.07820"><img src="https://img.shields.io/badge/SONIC-arXiv%202511.07820-b31b1b"></a>
   <img src="https://img.shields.io/badge/robot-Booster%20K1%2022--DoF-blue">
   <img src="https://img.shields.io/badge/sim2sim-Isaac%20→%20MuJoCo-green">
@@ -35,10 +37,12 @@ One policy, thousands of human motions, trained from scratch with under 1% of SO
 
 **How it compares** (SONIC's own success rule, root or end-effector height off by > 0.25 m; others as published on the Unitree G1, so this is indicative):
 
-| Benchmark | **SONIC-K1** (ours, K1) | SONIC (G1) | BeyondMimic (G1) | Any2Track (G1) |
+| Benchmark | **SONIC-K1** (ours, K1; run by us) | SONIC (G1)\* | BeyondMimic (G1)\* | Any2Track (G1)\* |
 |---|---|---|---|---|
 | PHUMA | **93.6%** | 97.2% | 73.8% | 78.5% |
 | Held-out mocap | **97.4%** | 98.5% | 82.0% | 61.6% |
+
+\* *Reported in the SONIC paper (Luo et al., arXiv 2511.07820). We did not rerun these methods.*
 
 Details and LAFAN1 are in [`docs/k1/eval.md`](docs/k1/eval.md).
 
@@ -51,26 +55,40 @@ Details and LAFAN1 are in [`docs/k1/eval.md`](docs/k1/eval.md).
 | Unseen success, SONIC's rule | 98.5% (in-house test set) | 97.4% (MuJoCo) |
 
 
-## Get started
-
-### 1. Play the policy in MuJoCo (CPU is fine)
+## Try it in 2 minutes (laptop, no GPU)
 ```bash
-git clone https://github.com/Kyk0/sonic-k1 && cd sonic-k1
-# same environment as upstream SONIC (see README.md → Installation), plus mujoco + onnxruntime
-huggingface-cli download Kyry10/sonic-k1 --local-dir checkpoints/sonic-k1
+GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 https://github.com/Kyk0/sonic-k1 && cd sonic-k1
+pip install mujoco onnxruntime numpy "imageio[ffmpeg]" huggingface_hub     # Python 3.10+
+hf download Kyry10/sonic-k1 onnx/policy_g1.onnx k1_plant.json --local-dir checkpoints/sonic-k1
+
+python gear_sonic/scripts/play_k1.py                                         # live viewer (macOS: use mjpython)
+python gear_sonic/scripts/play_k1.py --motion examples/k1/motions/zombie_walk.npz --record zombie.mp4
+```
+The first command opens a MuJoCo window with the K1 doing a penguin walk. The second one saves a video you can share.
+Six sample motions ship in [`examples/k1/motions/`](examples/k1/motions/): `penguin_walk`, `zombie_walk`, `robot_walk`,
+`chicken_walk`, `dinosaur_walk`, `superman_walk`. They are K1 retargets of the [100STYLE](https://doi.org/10.5281/zenodo.8127870)
+dataset (CC BY 4.0), and the policy never trained on them.
+
+### Your own motion
+`play_k1.py` takes any `.npz` with `qpos` [T, 29] (root xyz, root quat wxyz, 22 joints in MuJoCo order) and `fps`.
+To get one from a human clip (SMPL-X, BVH, or a phone video through a pose estimator such as GVHMR), retarget it to the K1 with
+[UMR](https://github.com/hanyang9/UMR) using the settings in [`docs/k1/data.md`](docs/k1/data.md). The UMR output plays directly:
+```bash
+python gear_sonic/scripts/play_k1.py --motion my_move_k1.npz --record my_move.mp4
+```
+Made something fun? Share the video and tag **#SONICK1**.
+
+### Reproduce the benchmarks
+Batch evaluation in MuJoCo (all success rules, MPJPE, robustness knobs) needs the upstream SONIC environment and a K1 motion
+library made with [`convert_k1_npz_to_motion_lib.py`](gear_sonic/data_process/convert_k1_npz_to_motion_lib.py):
+```bash
+hf download Kyry10/sonic-k1 --local-dir checkpoints/sonic-k1
 python gear_sonic/scripts/eval_k1_mujoco.py \
-    --checkpoint checkpoints/sonic-k1/sonic_k1_it50000_actor.pt \
-    --onnx checkpoints/sonic-k1/onnx \
-    --motion-dir <k1_motion_lib_dir> --out runs/mujoco --render-dir runs/mujoco/qpos
+    --checkpoint checkpoints/sonic-k1/sonic_k1_it50000_actor.pt --onnx checkpoints/sonic-k1/onnx \
+    --motion-dir <k1_motion_lib_dir> --out runs/mujoco --no-terminate
 ```
 
-### 2. Bring your own motion
-Retarget any SMPL/BVH clip to K1 with [UMR](https://github.com/hanyang9/UMR), using
-UMR's Booster K1 example config, switched to the official K1 model (see [`docs/k1/data.md`](docs/k1/data.md)), then convert it with
-[`gear_sonic/data_process/convert_k1_npz_to_motion_lib.py`](gear_sonic/data_process/convert_k1_npz_to_motion_lib.py).
-Video → motion works too, through any monocular human-pose estimator (e.g. GVHMR) followed by UMR.
-
-### 3. Train your own
+### Train your own
 ```bash
 # Isaac Sim 5.1 / Isaac Lab, one H100 (80–96 GB); same setup as upstream training.md
 python gear_sonic/train_agent_trl.py \

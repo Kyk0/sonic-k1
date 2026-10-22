@@ -73,12 +73,12 @@ Success without a fall on unseen motions. Other methods run on the Unitree G1 as
 
 All rows use the SONIC paper's success rule: a rollout fails if the root or an end-effector height deviates by more than 0.25 m. Ours are in MuJoCo with `--no-terminate`.
 
-| Benchmark | **SONIC-K1** (ours, K1) | SONIC (G1) | BeyondMimic (G1) | Any2Track (G1) |
+| Benchmark | **SONIC-K1** (ours, K1; run by us) | SONIC (G1)\* | BeyondMimic (G1)\* | Any2Track (G1)\* |
 |---|---|---|---|---|
 | PHUMA (1,758 clips, G1→K1) | **93.6%** | 97.2% | 73.8% | 78.5% |
 | Held-out mocap (ours: 1,985 Bones-SEED; SONIC: in-house test-content) | **97.4%** | 98.5% | 82.0% | 61.6% |
 
-Sources: the SONIC paper (Luo et al., arXiv 2511.07820). The other methods run on the Unitree G1 with their own data and retargeting, so this comparison is indicative.
+\* Reported in the SONIC paper (Luo et al., arXiv 2511.07820); we did not rerun these methods. They run on the Unitree G1 with their own data and retargeting, so this comparison is indicative.
 SONIC-K1 is the first open-weights general motion-tracking model for the Booster K1.
 
 ## All four success rules (MuJoCo, it50000, `--no-terminate`; metrics over each rule's successful clips; MPJPE-L over K1's 12 links)

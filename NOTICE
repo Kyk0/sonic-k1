@@ -49,3 +49,7 @@ Files added (A) or modified (M) relative to upstream v1.1
   A	gear_sonic/utils/k1_reset_check.py
   A	gear_sonic/utils/k1_rollout_recorder.py
   A	gear_sonic/data/assets/robot_description/urdf/k1/meshes/*.STL (52 Booster K1 meshes)
+
+Sample motions (examples/k1/motions/*.npz): derived from the 100STYLE dataset by Ian Mason, Sebastian Starke and
+Taku Komura (2022), CC BY 4.0 (https://doi.org/10.5281/zenodo.8127870). Changes: converted to SMPL-X, retargeted to the
+Booster K1 and stored as joint-space trajectories. See examples/k1/motions/README.md.
