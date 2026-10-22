@@ -117,11 +117,11 @@ any motion data, raw or retargeted. See [`docs/k1/data.md`](docs/k1/data.md) for
 See [`NOTICE`](NOTICE) for the complete list of modified files.
 
 ## Coming soon
-- 🤖 **Real Booster K1 runs**: the policy on hardware, with videos
-- 🥽 **Whole-body teleoperation**: drive the K1 live from a VR headset
-- 🎮 **Deployment controller**: an open runtime for the Booster SDK
-- 🎥 **Video → K1**: SMPL/video input, so you can film a move and the K1 does it
-- 📈 **A bigger model**: trained on 62K motions (6× more)
+- [ ] **Real Booster K1 runs**: the policy on hardware, with videos
+- [ ] **Whole-body teleoperation**: drive the K1 live from a VR headset
+- [ ] **Deployment controller**: an open runtime for the Booster SDK
+- [ ] **Video to K1**: SMPL/video input, so you can film a move and the K1 does it
+- [ ] **A bigger model**: trained on 62K motions (6× more)
 
 ## License and credits
 - Code: Apache-2.0 (upstream NVIDIA license kept; our changes are listed in `NOTICE`).
