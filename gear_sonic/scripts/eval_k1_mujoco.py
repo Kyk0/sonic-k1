@@ -60,6 +60,12 @@ EE_HEIGHT_THR = 0.25           # eval.yaml ee_body_pos (z only)
 FOOT_POS_THR = 0.2             # training foot_pos_xyz (xyz, heading-aligned reference)
 EE_BODIES = ["left_ankle_roll_link", "right_ankle_roll_link", "left_elbow_yaw_link", "right_elbow_yaw_link"]
 FOOT_BODIES = ["left_ankle_roll_link", "right_ankle_roll_link"]
+PHC_DEV_THR = 0.5              # PHC: mean body-position deviation (m)
+# success rules = the checks whose first firing fails the clip
+RULES = {"paper": ("anchor_pos", "anchor_ori_full"),             # root height 0.25 m or orientation 1 rad (our default)
+         "sonic": ("anchor_pos", "ee_body_pos"),                 # SONIC paper: root or end-effector height > 0.25 m
+         "official": ("anchor_pos", "anchor_ori_full", "ee_body_pos", "foot_pos_xyz"),
+         "phc": ("phc_dev",)}                                    # PHC: mean body deviation > 0.5 m
 # training push_robot event (push_by_setting_velocity, every 4-6 s): max |delta| of root lin (x, y, z) / ang (roll, pitch, yaw) vel
 PUSH_LIN = np.array([0.35, 0.35, 0.14])
 PUSH_ANG = np.array([0.36, 0.36, 0.55])
@@ -598,7 +604,7 @@ class Evaluator:
         hist, last_a = ProprioHistory(), np.zeros(22, dtype=np.float32)
         rec = {k: [] for k in ("qpos", "ref_qpos", "body", "ref_body", "jpos", "ref_jpos", "action")}
         par = {m: 0.0 for m in (self.parity or {})}
-        checks = {"anchor_pos": None, "anchor_ori_full": None, "ee_body_pos": None, "foot_pos_xyz": None}
+        checks = {"anchor_pos": None, "anchor_ori_full": None, "ee_body_pos": None, "foot_pos_xyz": None, "phc_dev": None}
         result, t0 = "time_out", time.time()
         for n in range(n_steps):
             prop, tok = self.observe(clip, n, hist, last_a, noise)
@@ -635,10 +641,11 @@ class Evaluator:
             rel = quat_apply(dq[None], ref_body[self.foot_idx] - ref_p[None])
             rel_pos = np.concatenate([rp[:2], ref_p[2:]])[None] + rel
             fired["foot_pos_xyz"] = bool(np.any(np.linalg.norm(rel_pos - body[self.foot_idx], axis=-1) > FOOT_POS_THR))
+            fired["phc_dev"] = bool(np.linalg.norm(body - ref_body, axis=-1).mean() > PHC_DEV_THR)
             for name, f in fired.items():
                 if f and checks[name] is None:
                     checks[name] = k
-            if fired["anchor_pos"] or fired["anchor_ori_full"]:
+            if (fired["anchor_pos"] or fired["anchor_ori_full"]) and not self.opts.get("no_terminate"):
                 result = "anchor_pos" if fired["anchor_pos"] else "anchor_ori_full"
                 break
         out = {k: np.asarray(v) for k, v in rec.items()}
@@ -661,7 +668,7 @@ def _body_metrics(pred, gt):
 
 def clip_metrics(r: dict, dt: float = CONTROL_DT) -> dict:
     n = len(r["jpos"])
-    off = r["checks"]
+    off = {k: v for k, v in r["checks"].items() if k in RULES["official"]}
     official = [v for v in off.values() if v is not None]
     off_step = min(official) if official else None
     res = {
@@ -675,6 +682,12 @@ def clip_metrics(r: dict, dt: float = CONTROL_DT) -> dict:
         "first_fire": {k: v for k, v in off.items()},
     }
     res.update(_body_metrics(r["body"], r["ref_body"]))
+    # every rule from first-fire steps (exact for all rules when the rollout ran to the end, --no-terminate)
+    for rule, keys in RULES.items():
+        res[f"ok_{rule}"] = all(r["checks"].get(k) is None for k in keys)
+    res["full_rollout"] = n >= r["n_steps"]
+    if res["full_rollout"]:
+        res["success"] = res["ok_paper"]
     # PHC-style rule: fail if the mean (global) body-position deviation ever exceeds 0.5 m
     dev = np.linalg.norm(r["body"] - r["ref_body"], axis=-1).mean(-1) if n else np.zeros(1)
     res["phc_success"] = bool(r["result"] == "time_out" and dev.max() <= 0.5)
@@ -755,6 +768,10 @@ def aggregate(per_clip: list[dict]) -> dict:
            "fail_reasons": {k: sum(r["result"] == k for r in per_clip) for k in ("anchor_pos", "anchor_ori_full")},
            "official_first_fire": {k: sum(r["first_fire"][k] is not None and r["first_fire"][k] == r["official_fail_step"]
                                           for r in per_clip) for k in per_clip[0]["first_fire"]} if per_clip else {}}
+    for rule in RULES:
+        if per_clip and f"ok_{rule}" in per_clip[0]:
+            ok = [r for r in per_clip if r[f"ok_{rule}"]]
+            agg[f"rule_{rule}"] = {"success_rate": len(ok) / max(1, len(per_clip)), **{k: mean(ok, k) for k in AGG_KEYS}}
     agg["all"] = {k: mean(per_clip, k) for k in AGG_KEYS}
     agg["success_paper"] = {k: mean(succ, k) for k in AGG_KEYS}
     agg["success_official"] = {k: mean(osucc, k) for k in AGG_KEYS}
@@ -806,6 +823,8 @@ def main():
     ap.add_argument("--booster-effort-caps", action="store_true",
                     help="clamp torques to Booster's deploy limits (legs 30/35/20/40/20 N m instead of 68/76/38/112/38)")
     ap.add_argument("--name", default=None, help="run label for the printed table")
+    ap.add_argument("--no-terminate", action="store_true",
+                    help="run every clip to the end; every success rule (paper, sonic, official, phc) is then exact")
     ap.add_argument("--onnx", default=None, help="run the policy from <dir>/policy_g1.onnx instead of the .pt")
     ap.add_argument("--parity-onnx", default=None,
                     help="<dir> with policy_g1.onnx + model_encoder.onnx + model_decoder.onnx: report max |a_onnx - a_pt|")
@@ -829,7 +848,7 @@ def main():
     cfg_dict = OmegaConf.to_container(cfg, resolve=False)
     opts = dict(max_steps=args.max_steps, sim_dt=args.sim_dt, kp_scale=args.kp_scale, kd_scale=args.kd_scale,
                 obs_noise=args.obs_noise, render_dir=args.render_dir, contact_timeconst=args.contact_timeconst,
-                onnx=args.onnx, parity_onnx=args.parity_onnx, obs_noise_scale=args.obs_noise_scale,
+                onnx=args.onnx, parity_onnx=args.parity_onnx, no_terminate=args.no_terminate, obs_noise_scale=args.obs_noise_scale,
                 push_scale=args.push_scale, push_interval=args.push_interval, friction=args.friction, payload_kg=args.payload_kg,
                 latency_ms=args.latency_ms, strength=args.strength, booster_effort_caps=args.booster_effort_caps)
     print(f"[eval_k1_mujoco] {len(clips)} clips loaded in {time.time() - t0:.1f}s; {args.workers} workers", flush=True)
@@ -855,6 +874,11 @@ def main():
         for r in per_clip:
             f.write(",".join(str(r.get(c)) for c in cols) + "\n")
     print_table(agg, args.name or out.name)
+    for rule in RULES:
+        if f"rule_{rule}" in agg:
+            g = agg[f"rule_{rule}"]
+            print(f"rule {rule:8s}: success {100 * g['success_rate']:5.1f}%   (successful clips) MPJPE-L {g['mpjpe_l']:.1f}  "
+                  f"PA {g['mpjpe_pa']:.1f}  G {g['mpjpe_g']:.0f}  E_vel {g['vel_dist']:.2f}  E_acc {g['accel_dist']:.2f}")
     for m in ("fused", "split"):
         v = [r[f"parity_max_abs_{m}"] for r in per_clip if f"parity_max_abs_{m}" in r]
         if v:
