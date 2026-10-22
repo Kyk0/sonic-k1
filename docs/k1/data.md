@@ -36,7 +36,7 @@ kinematics, e.g., elevated surfaces, props and lying on the floor. Training used
 ```bash
 python gear_sonic/data_process/convert_k1_npz_to_motion_lib.py --input <k1_npz_dir> --output <motion_lib_dir>
 ```
-Then pass `<motion_lib_dir>` as `motion_lib_cfg.motion_file` (see README_K1.md → Train your own).
+Then pass `<motion_lib_dir>` as `motion_lib_cfg.motion_file` (see README.md → Train your own).
 
 ## Your own motions (video → K1)
 Any monocular human-motion estimator that outputs SMPL (we used GVHMR) → UMR (same K1 config) → converter above.

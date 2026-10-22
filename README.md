@@ -4,6 +4,7 @@ One policy, thousands of human motions, trained from scratch with under 1% of SO
 
 <p align="center">
   <a href="https://huggingface.co/Kyry10/sonic-k1"><img src="https://img.shields.io/badge/🤗%20weights-Kyry10%2Fsonic--k1-yellow"></a>
+  <a href="https://kyk0.github.io/sonic-k1/"><img src="https://img.shields.io/badge/project-page-8fe04a"></a>
   <a href="https://arxiv.org/abs/2511.07820"><img src="https://img.shields.io/badge/SONIC-arXiv%202511.07820-b31b1b"></a>
   <img src="https://img.shields.io/badge/robot-Booster%20K1%2022--DoF-blue">
   <img src="https://img.shields.io/badge/sim2sim-Isaac%20→%20MuJoCo-green">
@@ -31,6 +32,15 @@ One policy, thousands of human motions, trained from scratch with under 1% of SO
 | MPJPE-L / PA-MPJPE | **14.7 / 10.8 mm** | 15.2 / 11.2 mm |
 
 Isaac Lab, 10 s windows, deterministic. Hold-out split of Bones-SEED. Full protocol: [`docs/k1/eval.md`](docs/k1/eval.md).
+
+**How it compares** (success without a fall on unseen motions; others as published on the Unitree G1, so this is indicative):
+
+| Benchmark | **SONIC-K1** (ours, K1) | SONIC (G1) | BeyondMimic (G1) | Any2Track (G1) |
+|---|---|---|---|---|
+| PHUMA | **97.3%** | 97.2% | 73.8% | 78.5% |
+| Held-out mocap | **98.7%** | 98.5% | 82.0% | 61.6% |
+
+Details and LAFAN1 are in [`docs/k1/eval.md`](docs/k1/eval.md).
 
 **How much compute?** About 100 GPU-hours, under 1% of what the SONIC paper used for the G1:
 
