@@ -1,5 +1,5 @@
 <h1 align="center">SONIC-K1</h1>
-<p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights general motion tracker for the K1, built for small humanoids.<br>
+<p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights motion tracker for small humanoids.<br>
 One policy, thousands of human motions, trained from scratch with under 1% of SONIC's compute.</p>
 
 <p align="center"><b><a href="https://kyry.me/sonic-k1/">🌐 Project page &amp; videos</a> · <a href="#try-it-in-2-minutes-laptop-no-gpu">▶ Try it in 2 minutes</a></b></p>
