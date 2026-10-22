@@ -1,5 +1,5 @@
 <h1 align="center">SONIC-K1</h1>
-<p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>
+<p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights general motion tracker for the K1.<br>
 One policy, thousands of human motions, trained from scratch with ~1% of SONIC's compute.</p>
 
 <p align="center">

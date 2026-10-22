@@ -67,6 +67,19 @@ harder clips than the unseen-200, which is why seen scores lower here.
 
 **MuJoCo, full length:** unseen 1,985: 98.3% paper / 91.8% official-like; seen 2,000: 98.5% / 97.1%. Seen 2,000 at 10 s: 98.6% / 97.3%.
 
+## Comparison with published trackers (indicative)
+
+Success without a fall on unseen motions. Other methods run on the Unitree G1 as published, with their own retargeting and protocols.
+
+| Benchmark | **SONIC-K1** (ours, K1) | SONIC (G1) | BeyondMimic (G1) | Any2Track (G1) |
+|---|---|---|---|---|
+| PHUMA (MuJoCo) | **97.3%** | 97.2% | 73.8% | 78.5% |
+| Held-out mocap (ours: 1,985 Bones-SEED; SONIC: in-house test-content) | **98.7%** | 98.5% | 82.0% | 61.6% |
+| LAFAN1 (MuJoCo) | **84.6%** | 85.0% | 87.5% | 100%† |
+
+Sources: SONIC (Luo et al., arXiv 2511.07820) for PHUMA and held-out; GenTrack (arXiv 2608.01410, Tab. 1) for LAFAN1, with a 0.25 m pelvis-height rule. †Any2Track trains on LAFAN1.
+Prior K1 result: BRIDGE (Wang et al., arXiv 2609.03497, Tab. 5) trained SONIC on the K1 as a baseline (92.66% on a LAFAN1 + Bones-SEED mix, MuJoCo) and did not release it. To our knowledge, SONIC-K1 is the first open-weights general motion-tracking model for the Booster K1.
+
 ## External benchmarks (MuJoCo, it50000, zero-shot)
 | Benchmark | Clips | Paper-style | Official-like | PHC 0.5 m | MPJPE-L | PA | Notes |
 |---|---|---|---|---|---|---|---|
