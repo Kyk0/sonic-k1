@@ -65,6 +65,17 @@ harder clips than the unseen-200, which is why seen scores lower here.
 **MuJoCo, full set** (1,985 unseen, 10 s, g1 encoder): 98.4% paper / 91.9% official-like, MPJPE-L 16.6, PA 12.4, G 113 mm.
 **Hardware-like condition** (Booster deploy torque caps: legs 30/35/20/40/20 N·m vs 68/76/38/112/38 trained; + 20 ms action latency + PD ×0.8), 1,985 unseen: 95.9% / 87.7%, MPJPE-L 19.3 mm.
 
+**MuJoCo, full length:** unseen 1,985: 98.3% paper / 91.8% official-like; seen 2,000: 98.5% / 97.1%. Seen 2,000 at 10 s: 98.6% / 97.3%.
+
+## External benchmarks (MuJoCo, it50000, zero-shot)
+| Benchmark | Clips | Paper-style | Official-like | PHC 0.5 m | MPJPE-L | PA | Notes |
+|---|---|---|---|---|---|---|---|
+| **PHUMA** (HF release) | 1,758 (of 2,000 sampled across 15 sources; 87.9% pass QA after G1→K1) | **97.3%** | 85.0% | — | 23.3 | 16.6 | SONIC (G1, own protocol): 97.2% |
+| LAFAN1, 10 s windows | 65 (of 77; 12 fail QA) | 84.6% | 64.6% | 63.1% | 21.0 | 15.3 | includes fall-and-get-up, obstacle and crawling clips |
+| LAFAN1, full length (1–4 min) | 65 | 27.7% | 0% | 0% | 30.0 | 21.8 | one failure anywhere fails the clip |
+
+LAFAN1 and PHUMA retargets are not redistributed (LAFAN1 is CC BY-NC-ND).
+
 **ONNX vs PyTorch** (400 clips, ~190k control steps, PyTorch driving, ONNX evaluated on the same inputs):
 - 392/400 clips: max |Δa| ≤ 1.4e-5, median 1.1e-5 (float32; ≈1e-5 rad in joint targets);
 - 8/400 clips: one isolated jump of 8e-3 to 2e-2, from a single FSQ token sitting exactly on a quantization
