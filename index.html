@@ -378,5 +378,7 @@ const bars=document.getElementById('bars');
 bars.innerHTML=ROWS.map((r,i)=>(i===ROWS.length-1?'<div class="bsep"></div>':'')+`<div class="brow${r[3]?' key':''}" title="${r[0]}: ${r[2]}% finished without a fall"><div class="bl">${r[0]}<small>${r[1]}</small></div><div class="track"><div class="fill" data-w="${r[2]}"></div></div><div class="bv">${r[2].toFixed(1)}%</div></div>`).join('');
 new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){bars.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%');o.disconnect()}}),{threshold:.2}).observe(bars);
 </script>
+<!-- Cloudflare Web Analytics: visit counts, no cookies -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "27aa3afcfa9a4cdf835daa06cb812b31"}'></script>
 </body>
 </html>
