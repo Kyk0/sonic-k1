@@ -63,13 +63,15 @@ pip install mujoco onnxruntime numpy "imageio[ffmpeg]" huggingface_hub     # Pyt
 hf download Kyry10/sonic-k1 onnx/policy_g1.onnx k1_plant.json --local-dir checkpoints/sonic-k1
 
 python gear_sonic/scripts/play_k1.py                                         # live viewer (macOS: use mjpython)
-python gear_sonic/scripts/play_k1.py --motion examples/k1/motions/zombie_walk.npz --record zombie.mp4
+python gear_sonic/scripts/play_k1.py --record demo.mp4
 ```
 For training or the full benchmarks, clone the whole repo (`git clone https://github.com/Kyk0/sonic-k1`) instead.
-The first command opens a MuJoCo window with the K1 doing a penguin walk. The second one saves a video you can share.
-Six sample motions ship in [`examples/k1/motions/`](examples/k1/motions/): `penguin_walk`, `zombie_walk`, `robot_walk`,
-`chicken_walk`, `dinosaur_walk`, `superman_walk`. They are K1 retargets of the [100STYLE](https://doi.org/10.5281/zenodo.8127870)
-dataset (CC BY 4.0), and the policy never trained on them.
+The first command opens a MuJoCo window and plays all ten sample motions back to back, starting with shadow boxing.
+The second one saves the same demo as a video you can share. For one clip, add `--motion examples/k1/motions/squat.npz`.
+Ten sample motions ship in [`examples/k1/motions/`](examples/k1/motions/): `shadow_boxing`, `boxing_dodge`,
+`scissors_jump`, `mountain_climber`, `high_knees`, `forward_lunge`, `squat`, `crouch_walk`, `injured_leg_jog`,
+`exaggerated_walk`. They are SONIC-K1's own recorded motion on held-out clips it never trained on (no human motion
+capture data); see the folder README for source and license.
 
 ### Your own motion
 `play_k1.py` takes any `.npz` with `qpos` [T, 29] (root xyz, root quat wxyz, 22 joints in MuJoCo order) and `fps`.

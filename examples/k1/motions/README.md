@@ -1,21 +1,27 @@
 # Sample K1 motions
 
-Six walking styles for `gear_sonic/scripts/play_k1.py`. None of them were in SONIC-K1's training data.
+Ten motions for `gear_sonic/scripts/play_k1.py`. None of them were in SONIC-K1's training data.
 
-| File | 100STYLE style |
-|---|---|
-| `penguin_walk.npz` | Penguin, forward walk |
-| `zombie_walk.npz` | Zombie, forward walk |
-| `robot_walk.npz` | Robot, forward walk |
-| `chicken_walk.npz` | Chicken, forward walk |
-| `dinosaur_walk.npz` | Dinosaur, forward walk |
-| `superman_walk.npz` | Superman, forward walk |
+| File | Motion | Length |
+|---|---|---|
+| `shadow_boxing.npz` | Shadow boxing (the default) | 12.0 s |
+| `boxing_dodge.npz` | Boxing dodge with a 270° turn | 3.9 s |
+| `scissors_jump.npz` | Scissors jumps | 5.6 s |
+| `mountain_climber.npz` | Standing mountain climber | 4.0 s |
+| `high_knees.npz` | High-knees jog | 4.1 s |
+| `forward_lunge.npz` | Forward lunges | 9.0 s |
+| `squat.npz` | Squats | 7.9 s |
+| `crouch_walk.npz` | Crouch walk with a turn | 4.8 s |
+| `injured_leg_jog.npz` | Jogging on an injured leg | 4.1 s |
+| `exaggerated_walk.npz` | Exaggerated walk | 26.2 s |
 
-Format: `qpos` [600, 29] float32 (root xyz, root quat wxyz, 22 joints in MuJoCo `k1.xml` order) and `fps` (30). Each file
+Format: `qpos` [T, 29] float32 (root xyz, root quat wxyz, 22 joints in MuJoCo `k1.xml` order) at `fps` 50. Each file
 also carries `joint_names`, `source` and `processing` strings.
 
-**Source and license.** Derived from the [100STYLE dataset](https://doi.org/10.5281/zenodo.8127870) by Ian Mason,
-Sebastian Starke and Taku Komura ("Real-Time Style Modelling of Human Locomotion via Feature-Wise Transformations and Local
-Motion Phases", 2022), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-**Changes made:** BVH converted to SMPL-X, retargeted to the Booster K1 with UMR, and stored as K1 joint-space trajectories
-at 30 fps. These derived files are shared under the same CC BY 4.0 license.
+**What these are.** Robot trajectories recorded from SONIC-K1 itself: the policy tracked a held-out Bones-SEED clip
+(retargeted to the K1) in MuJoCo, and the robot's own joint and root motion was saved at 50 Hz. They contain no human
+motion capture data.
+
+**Source and license.** Training data includes Motion Data by Bones Studio (https://bones.studio/). Use of the
+underlying dataset is subject to the BONES Motion Capture Dataset License Agreement. Like the model weights, these
+files are for non-commercial use (CC BY-NC 4.0).
