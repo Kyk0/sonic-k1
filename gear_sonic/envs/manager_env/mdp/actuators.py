@@ -36,6 +36,8 @@ class DelayedImplicitActuator(ImplicitActuator):
         self.efforts_delay_buffer = DelayBuffer(cfg.max_delay, self._num_envs, device=self._device)
         # all of the envs
         self._ALL_INDICES = torch.arange(self._num_envs, dtype=torch.long, device=self._device)
+        # current upper bound of the sampled delay (<= cfg.max_delay), set by mdp.curriculum.actuator_delay_ramp
+        self.delay_cap = cfg.max_delay
 
     def reset(self, env_ids: Sequence[int]):
         super().reset(env_ids)
@@ -47,7 +49,7 @@ class DelayedImplicitActuator(ImplicitActuator):
         # set a new random delay for environments in env_ids
         time_lags = torch.randint(
             low=self.cfg.min_delay,
-            high=self.cfg.max_delay + 1,
+            high=max(self.cfg.min_delay, self.delay_cap) + 1,
             size=(num_envs,),
             dtype=torch.int,
             device=self._device,

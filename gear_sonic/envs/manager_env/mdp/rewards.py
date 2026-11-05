@@ -56,6 +56,7 @@ class RewardsCfg:
     is_terminated = None
     upright_penalty = None
     tracking_head_joint_pos = None  # K1 head joint tracking (tracking_joint_pos_error)
+    torque_near_limit = None  # K1 real plant: PD torque demand above a fraction of the effort cap
 
 
 def tracking_anchor_pos_error(
@@ -260,6 +261,23 @@ def energy_consumption(
         robot_name = getattr(asset_cfg, "name", "robot")
     robot = env.scene[robot_name]
     return torch.abs(robot.data.applied_torque * robot.data.joint_vel).sum(dim=-1)
+
+
+def torque_near_limit(
+    env: ManagerBasedRLEnv,
+    actuator_names: list[str],
+    threshold: float = 0.9,
+    asset_name: str = "robot",
+) -> torch.Tensor:
+    """Penalize PD torque demand above threshold x effort limit: sum over joints of the excess ratio
+    (unclipped demand / limit - threshold, at most 1 per joint). Zero while every joint stays under the threshold."""
+    robot = env.scene[asset_name]
+    out = torch.zeros(env.num_envs, device=env.device)
+    for name in actuator_names:
+        act = robot.actuators[name]
+        ratio = act.computed_effort.abs() / act.effort_limit
+        out += torch.clamp(ratio - threshold, min=0.0, max=1.0).sum(dim=-1)
+    return out
 
 
 def tracking_local_head_ori_error(

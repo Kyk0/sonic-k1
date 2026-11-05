@@ -233,3 +233,44 @@ for a in K1_CFG.actuators.values():
     for n in names:
         if n in e and n in s and s[n]:
             K1_ACTION_SCALE[n] = 0.25 * e[n] / s[n]
+
+
+# Real-K1 plant (robot type "k1_real", leg fine-tune 2026-10-27). Same gains, armature and action scale as K1_CFG
+# (so it50000 resumes as-is), but:
+#  - leg/ankle torque capped at Booster's deploy limits (booster_deploy K1_CFG.effort_limit; the robot clips there,
+#    K1_CFG allowed 2-3x more, and on hardware the ankles sat at the cap)
+#  - every joint command delayed by a random 0..MAX_DELAY_STEPS physics steps per episode (5 ms each), raised from 0
+#    by mdp.curriculum.actuator_delay_ramp. A fresh boot on the robot halved leg jitter, so latency matters.
+BOOSTER_DEPLOY_EFFORT_LEGS = {
+    ".*_hip_pitch_joint": 30.0,
+    ".*_hip_roll_joint": 35.0,
+    ".*_hip_yaw_joint": 20.0,
+    ".*_knee_pitch_joint": 40.0,
+}
+BOOSTER_DEPLOY_EFFORT_ANKLE = 20.0
+# eval at a fixed delay: K1_MIN_DELAY_STEPS=K1_MAX_DELAY_STEPS=<n>
+MIN_DELAY_STEPS = int(os.environ.get("K1_MIN_DELAY_STEPS", "0"))
+MAX_DELAY_STEPS = int(os.environ.get("K1_MAX_DELAY_STEPS", "8"))  # 8 x 5 ms = 40 ms
+
+
+def _make_k1_real_cfg():
+    from gear_sonic.envs.manager_env.mdp.actuators import DelayedImplicitActuatorCfg
+
+    caps = {"legs": BOOSTER_DEPLOY_EFFORT_LEGS, "feet": BOOSTER_DEPLOY_EFFORT_ANKLE}
+    cfg = K1_CFG.copy()
+    cfg.actuators = {
+        k: DelayedImplicitActuatorCfg(
+            joint_names_expr=a.joint_names_expr,
+            effort_limit_sim=caps.get(k, a.effort_limit_sim),
+            stiffness=a.stiffness,
+            damping=a.damping,
+            armature=a.armature,
+            min_delay=MIN_DELAY_STEPS,
+            max_delay=MAX_DELAY_STEPS,
+        )
+        for k, a in K1_CFG.actuators.items()
+    }
+    return cfg
+
+
+K1_REAL_CFG = _make_k1_real_cfg()

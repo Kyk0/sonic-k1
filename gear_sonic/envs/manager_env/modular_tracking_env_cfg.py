@@ -1011,6 +1011,11 @@ class ModularTrackingEnvCfg(ManagerBasedRLEnvCfg):
                 "action_scale": k1.K1_ACTION_SCALE,
                 "isaaclab_to_mujoco_mapping": k1.K1_ISAACLAB_TO_MUJOCO_MAPPING,
             },
+            "k1_real": {
+                "robot_cfg": k1.K1_REAL_CFG,
+                "action_scale": k1.K1_ACTION_SCALE,  # from K1_CFG's limits: the policy's action space is unchanged
+                "isaaclab_to_mujoco_mapping": k1.K1_ISAACLAB_TO_MUJOCO_MAPPING,
+            },
         }
 
         robot_type = config["robot"].get("type", "g1")

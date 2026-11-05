@@ -12,6 +12,7 @@ the curriculum introduced by the function.
 """
 
 from collections.abc import Sequence
+import os
 from typing import TYPE_CHECKING
 
 from isaaclab.assets import Articulation
@@ -30,6 +31,22 @@ class CurriculumCfg:
 
     force_push_curriculum = None
     force_push_linear_curriculum = None
+    actuator_delay_ramp = None
+
+
+def actuator_delay_ramp(env, env_ids, ramp_steps: int, start_steps: int = 0, asset_name: str = "robot"):
+    """Raise the max command delay of DelayedImplicitActuators linearly from 0 to cfg.max_delay physics steps
+    between env steps start_steps and start_steps + ramp_steps. Returns the current max delay (physics steps)."""
+    # K1_DELAY_RAMP_OFFSET: env steps of this ramp already done before a resume (set by train.sh from the
+    # checkpoint step), so a restart/preemption does not drop the delay back to 0
+    done = env.common_step_counter + int(os.environ.get("K1_DELAY_RAMP_OFFSET", "0"))
+    frac = min(max((done - start_steps) / max(ramp_steps, 1), 0.0), 1.0)
+    cap = 0
+    for act in env.scene[asset_name].actuators.values():
+        if hasattr(act, "delay_cap"):
+            act.delay_cap = round(frac * act.cfg.max_delay)
+            cap = max(cap, act.delay_cap)
+    return cap
 
 
 def terrain_levels_vel(
