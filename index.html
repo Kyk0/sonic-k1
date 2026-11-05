@@ -293,7 +293,7 @@ footer a{color:var(--muted)}
     <h2>Ready for the real K1.</h2>
     <p class="sub">v1.0 is fine-tuned with the real robot's motor torque limits and up to 40&nbsp;ms of control delay. It runs on the K1's own computer with our open robot app: pick a motion, press go, and a damping key stops it at any moment.</p>
     <div class="bars viz-root" id="vbars" role="img" aria-label="Share of unseen motions finished, v0.1 versus v1.0, under real-robot conditions">
-      <div class="vleg"><span>v0.1</span><span class="v1">v1.0</span></div>
+      <div class="vleg"><span class="v1">v1.0</span><span>v0.1</span></div>
     </div>
     <p class="note">MuJoCo, SONIC's success rule, all 1,985 unseen Bones-SEED motions (PHUMA: 1,758). Real-robot = Booster's deploy torque limits, sensor noise and the given delay.</p>
     <div class="code" style="margin-top:18px"><button class="copy" data-copy="rk">Copy</button><pre id="rk">bash sonic_k1_deploy/make_kit.sh sonic_k1_kit       # code + weights + K1 model + sample motions
@@ -409,7 +409,7 @@ const VROWS=[
   ['PHUMA, real-robot, 40 ms','external benchmark, 1,758 motions',78.0,91.7],
 ];
 const vbars=document.getElementById('vbars');
-vbars.insertAdjacentHTML('beforeend',VROWS.map(r=>`<div class="vrow" title="${r[0]}: v0.1 ${r[2]}%, v1.0 ${r[3]}%"><div class="bl">${r[0]}<small>${r[1]}</small></div><div class="track"><div class="fill v0" data-w="${r[2]}"></div></div><div class="bv v0">${r[2].toFixed(1)}%</div><div class="track"><div class="fill v1" data-w="${r[3]}"></div></div><div class="bv">${r[3].toFixed(1)}%</div></div>`).join(''));
+vbars.insertAdjacentHTML('beforeend',VROWS.map(r=>`<div class="vrow" title="${r[0]}: v1.0 ${r[3]}%, v0.1 ${r[2]}%"><div class="bl">${r[0]}<small>${r[1]}</small></div><div class="track"><div class="fill v1" data-w="${r[3]}"></div></div><div class="bv">${r[3].toFixed(1)}%</div><div class="track"><div class="fill v0" data-w="${r[2]}"></div></div><div class="bv v0">${r[2].toFixed(1)}%</div></div>`).join(''));
 new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){vbars.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%');o.disconnect()}}),{threshold:.2}).observe(vbars);
 const bars=document.getElementById('bars');
 bars.innerHTML=ROWS.map((r,i)=>(i===ROWS.length-1?'<div class="bsep"></div>':'')+`<div class="brow${r[3]?' key':''}" title="${r[0]}: ${r[2]}% finished without a fall"><div class="bl">${r[0]}<small>${r[1]}</small></div><div class="track"><div class="fill" data-w="${r[2]}"></div></div><div class="bv">${r[2].toFixed(1)}%</div></div>`).join('');
