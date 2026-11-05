@@ -31,6 +31,11 @@ kinematics, e.g., elevated surfaces, props and lying on the floor. Training used
 - **9,991 clips** (`train_10k`), stratified across Bones-SEED categories. All of them are QA-passing and tagged feasible
   (the feasible pool is 62,427 clips).
 - **Eval split frozen before any training.** 1,985 of its clips are used as the unseen set, none of them in `train_10k`.
+- **Exact lists:** [`bones_seed_splits.csv`](bones_seed_splits.csv), one row per clip (Bones-SEED motion name):
+  `split` = `train` (the 9,991 training clips) or `test` (the 1,985 unseen eval clips); `in_seen_eval` = `yes` for the
+  2,000 training clips used as the *seen* eval set. Names ending in `_M` are Bones-SEED's mirrored takes. Names only:
+  you need your own Bones-SEED access to get the motions. Note: 7 test clips are mirrored takes whose original is in
+  the training list (or the reverse).
 
 ## 5. Convert to SONIC motion_lib
 ```bash

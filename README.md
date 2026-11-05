@@ -2,7 +2,7 @@
 <p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights motion tracker for small humanoids.<br>
 One policy, thousands of human motions, trained from scratch with under 1% of SONIC's compute.</p>
 
-<p align="center"><b><a href="https://kyry.me/sonic-k1/">🌐 Project page &amp; videos</a> · <a href="#try-it-in-2-minutes-laptop-no-gpu">▶ Try it in 2 minutes</a></b></p>
+<p align="center"><b><a href="https://kyry.me/sonic-k1/">🌐 Project page &amp; videos</a> · <a href="#try-it-in-2-minutes-laptop-no-gpu">▶ Try it in 2 minutes</a> · <a href="sonic_k1_deploy/">🤖 Run it on a K1</a></b></p>
 
 <p align="center">
   <a href="https://huggingface.co/Kyry10/sonic-k1"><img src="https://img.shields.io/badge/🤗%20weights-Kyry10%2Fsonic--k1-yellow"></a>
@@ -10,6 +10,7 @@ One policy, thousands of human motions, trained from scratch with under 1% of SO
   <a href="https://arxiv.org/abs/2511.07820"><img src="https://img.shields.io/badge/SONIC-arXiv%202511.07820-b31b1b"></a>
   <img src="https://img.shields.io/badge/robot-Booster%20K1%2022--DoF-blue">
   <img src="https://img.shields.io/badge/sim2sim-Isaac%20→%20MuJoCo-green">
+  <img src="https://img.shields.io/badge/tested-real%20K1-orange">
 </p>
 
 <p align="center"><img src="docs/k1/media/hero.webp" width="100%"></p>
@@ -24,33 +25,41 @@ One policy, thousands of human motions, trained from scratch with under 1% of SO
 > **Booster K1** as a SONIC embodiment. Everything K1-specific is documented here and in [`docs/k1/`](docs/k1/).
 > The original NVIDIA README is kept unchanged in [`README_SONIC_upstream.md`](README_SONIC_upstream.md).
 
+**v1.0 (November 2026): tested on a real Booster K1.** v1.0 is fine-tuned for the real robot (Booster's deploy torque
+limits on the legs, 0–40 ms of control latency) and runs on the K1's onboard computer with the robot app in
+[`sonic_k1_deploy/`](sonic_k1_deploy/). Weights: [Kyry10/sonic-k1](https://huggingface.co/Kyry10/sonic-k1) (v0.1 in `v0.1/`).
+
 ## Results
 
-| | Unseen (1,985 clips) | Seen (2,000 clips) |
-|---|---|---|
-| Success, SONIC's rule (root or end-effector height off > 0.25 m; MuJoCo) | **97.4%** | — |
-| Success, no-fall rule (root height + tilt; Isaac) | **98.7%** | 98.8% |
-| Success, strict repo eval (adds foot-position limit; Isaac) | 93.1% | 98.5% |
-| MPJPE-L / PA-MPJPE | **14.7 / 10.8 mm** | 15.2 / 11.2 mm |
+MuJoCo sim-to-sim, all clips, 10 s, deterministic. SONIC's rule (root or end-effector height off > 0.25 m) / official-like rule.
+*Real-robot* = Booster deploy torque limits + sensor noise + command latency.
 
-10 s windows, deterministic. Hold-out split of Bones-SEED. Full protocol: [`docs/k1/eval.md`](docs/k1/eval.md).
+| Condition | Unseen (1,985), v0.1 | Unseen (1,985), **v1.0** | Seen (2,000), **v1.0** |
+|---|---|---|---|
+| Nominal | 97.5% / 92.0% | **97.4% / 91.5%** | 98.4% / 96.8% |
+| Real-robot, 20 ms latency | 95.5% / 85.9% | **97.1% / 90.6%** | 98.0% / 96.4% |
+| Real-robot, 40 ms latency | 76.7% / 58.5% | **96.6% / 89.1%** | 97.9% / 95.1% |
+| MPJPE-L, nominal | 15.4 mm | 17.1 mm | 16.4 mm |
+
+Hold-out split of Bones-SEED; the exact clip lists are in [`docs/k1/bones_seed_splits.csv`](docs/k1/bones_seed_splits.csv).
+Full protocol, Isaac Lab numbers and v0.1 details: [`docs/k1/eval.md`](docs/k1/eval.md).
 
 **How it compares** (SONIC's own success rule, root or end-effector height off by > 0.25 m; others as published on the Unitree G1, so this is indicative):
 
 | Benchmark | **SONIC-K1** (ours, K1; run by us) | SONIC (G1)\* | BeyondMimic (G1)\* | Any2Track (G1)\* |
 |---|---|---|---|---|
-| PHUMA | **93.6%** | 97.2% | 73.8% | 78.5% |
+| PHUMA | **92.3%** | 97.2% | 73.8% | 78.5% |
 | Held-out mocap | **97.4%** | 98.5% | 82.0% | 61.6% |
 
 \* *Reported in the SONIC paper (Luo et al., arXiv 2511.07820). We did not rerun these methods.*
 
 Details and LAFAN1 are in [`docs/k1/eval.md`](docs/k1/eval.md).
 
-**How much compute?** About 100 GPU-hours, under 1% of what the SONIC paper used for the G1:
+**How much compute?** About 110 GPU-hours (100 for v0.1 + 9 for the v1.0 fine-tune), about 1% of what the SONIC paper used for the G1:
 
 | | SONIC (G1, paper) | SONIC-K1 |
 |---|---|---|
-| GPU-hours | >9,000 | **~100** |
+| GPU-hours | >9,000 | **~110** |
 | Training motions | ~100M frames (700 h) | 9,991 clips |
 | Unseen success, SONIC's rule | 98.5% (in-house test set) | 97.4% (MuJoCo) |
 
@@ -88,8 +97,9 @@ library made with [`convert_k1_npz_to_motion_lib.py`](gear_sonic/data_process/co
 ```bash
 hf download Kyry10/sonic-k1 --local-dir checkpoints/sonic-k1
 python gear_sonic/scripts/eval_k1_mujoco.py \
-    --checkpoint checkpoints/sonic-k1/sonic_k1_it50000_actor.pt --onnx checkpoints/sonic-k1/onnx \
+    --checkpoint checkpoints/sonic-k1/sonic_k1_v1_actor.pt --onnx checkpoints/sonic-k1/onnx \
     --motion-dir <k1_motion_lib_dir> --out runs/mujoco --no-terminate
+# real-robot condition: add --booster-effort-caps --latency-ms 40 --obs-noise
 ```
 
 ### Train your own
@@ -100,6 +110,19 @@ python gear_sonic/train_agent_trl.py \
     num_envs=16384 headless=True \
     ++manager_env.commands.motion.motion_lib_cfg.motion_file=<path/to/k1_motion_lib>
 ```
+v1.0 real-robot fine-tune (resume from v0.1 with the `k1_real` robot: Booster torque limits, 0–40 ms delay ramped in
+over 2,000 iterations, kp/kd ×U(0.9, 1.1), torque-near-limit penalty):
+```bash
+mkdir -p runs/legs && cp <your full v0.1-style training checkpoint>.pt runs/legs/last.pt   # actor + critic + optimizer
+python gear_sonic/train_agent_trl.py \
+    +exp=manager/universal_token/all_modes/sonic_k1_legs \
+    num_envs=16384 headless=True ++resume=True ++experiment_dir=runs/legs \
+    ++manager_env.commands.motion.motion_lib_cfg.motion_file=<path/to/k1_motion_lib> \
+    ++manager_env.commands.motion.motion_lib_cfg.override_num_motions_to_load=1000000   # all clips on the GPU
+# after a restart mid-ramp: K1_DELAY_RAMP_OFFSET=<env steps already done> keeps the delay where it was
+# (the released actor-only .pt has no critic/optimizer, so fine-tuning from it starts the critic fresh)
+```
+
 Training on headless H100 servers? SONIC-K1 was trained with the setup in our [Isaac Lab on H100 guide](https://github.com/Kyk0/isaaclab-h100): physics-only Isaac Lab on shared, compute-only GPUs. A pre-converted K1 USD (the exact asset used for training) is at [Kyry10/booster-k1-usd](https://huggingface.co/datasets/Kyry10/booster-k1-usd).
 
 You need your own access to [Bones-SEED](https://huggingface.co/datasets/bones-studio/seed). We do **not** redistribute
@@ -115,13 +138,16 @@ any motion data, raw or retargeted. See [`docs/k1/data.md`](docs/k1/data.md) for
   - init std 0.5.
 - MuJoCo sim-to-sim eval: the actor gives the same outputs as in Isaac Lab, 5 ms physics, 50 Hz policy. 99.0% of 200 unseen clips run without a fall.
 - ONNX export (fused `policy_g1.onnx` + split encoder/decoder), with `--parity-onnx` to check it against PyTorch.
+- Real-K1 plant (`k1_real`, v1.0): Booster deploy torque limits, `DelayedImplicitActuator` 0–40 ms with a ramp curriculum,
+  gain randomization, torque-near-limit penalty (`sonic_k1_legs.yaml`).
+- [`sonic_k1_deploy/`](sonic_k1_deploy/): robot app for the Booster SDK (motion menu, damping key, safety guards, MuJoCo and fake-SDK rehearsal).
 
 See [`NOTICE`](NOTICE) for the complete list of modified files.
 
 ## Coming soon
-- [ ] **Real Booster K1 runs**: the policy on hardware, with videos
+- [x] **Real Booster K1 runs**: v1.0 runs on the physical robot (videos coming)
+- [x] **Deployment controller**: an open runtime for the Booster SDK ([`sonic_k1_deploy/`](sonic_k1_deploy/))
 - [ ] **Whole-body teleoperation**: drive the K1 live from a VR headset
-- [ ] **Deployment controller**: an open runtime for the Booster SDK
 - [ ] **Video to K1**: SMPL/video input, so you can film a move and the K1 does it
 - [ ] **A bigger model**: trained on 62K motions (6× more)
 

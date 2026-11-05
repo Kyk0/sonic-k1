@@ -1,5 +1,8 @@
 # SONIC-K1 on a real Booster K1: deploy script and test ladder
 
+> **For the real robot use [`sonic_k1_deploy/`](../../sonic_k1_deploy/)**: the motion-menu app that SONIC-K1 v1.0 was run
+> with on a physical K1. This older single-clip runner is kept for reference.
+
 `deploy_k1_booster.py` runs `policy_g1.onnx` (robot-motion tracking) at 50 Hz on the Booster low-level SDK
 (`/low_state` in, `joint_ctrl` out, `B1LocoClient` for mode changes), with a safety layer. **It has not been run on
 hardware yet.** Everything below was checked only in the MuJoCo bench backend (`--backend mujoco`), which runs the

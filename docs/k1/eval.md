@@ -1,6 +1,45 @@
 # SONIC-K1 evaluation protocol
 
-All numbers are for checkpoint **it50000** (`model_step_050000.pt`), deterministic actions, Isaac Lab `im_eval`.
+v1.0 (iteration 54,000, real-robot fine-tune) is in the first section. Everything after it is the v0.1 release
+(checkpoint **it50000**, `model_step_050000.pt`), deterministic actions, Isaac Lab `im_eval`.
+
+## v1.0 vs v0.1 (same code, same clips)
+
+**MuJoCo** (`eval_k1_mujoco.py`, 10 s clips, all 1,985 unseen + 2,000 seen). *Real-robot* = `--booster-effort-caps
+--obs-noise --latency-ms <20|40>`. SONIC's rule / official-like, MPJPE-L over successful clips:
+
+| Condition | Unseen, v0.1 | Unseen, v1.0 | Seen, v0.1 | Seen, v1.0 |
+|---|---|---|---|---|
+| Nominal | 97.5% / 92.0%, 15.4 mm | 97.4% / 91.5%, 17.1 mm | 98.7% / 97.2%, 15.0 mm | 98.4% / 96.8%, 16.4 mm |
+| Real-robot, 20 ms | 95.5% / 85.9%, 18.1 mm | 97.1% / 90.6%, 17.6 mm | 97.4% / 92.3%, 17.7 mm | 98.0% / 96.4%, 17.1 mm |
+| Real-robot, 40 ms | 76.7% / 58.5%, 21.2 mm | 96.6% / 89.1%, 18.2 mm | 78.3% / 59.6%, 22.5 mm | 97.9% / 95.1%, 18.1 mm |
+
+**PHUMA** (1,758 clips, `--no-terminate`). SONIC's rule / official-like, MPJPE-L, joint jerk:
+
+| Condition | v0.1 | v1.0 |
+|---|---|---|
+| Nominal | 93.8% / 84.9%, 22.6 mm, 312 | 92.3% / 81.7%, 25.2 mm, 296 |
+| Real-robot, 20 ms | 92.2% / 83.1%, 22.8 mm, 544 | 92.2% / 81.0%, 25.1 mm, 446 |
+| Real-robot, 40 ms | 78.0% / 68.9%, 23.9 mm, 1252 | 91.7% / 79.4%, 25.4 mm, 459 |
+
+**Isaac Lab `im_eval`, official rule**, both checkpoints with the `k1_real` robot (Booster torque limits); fixed delay via
+`K1_MIN_DELAY_STEPS=K1_MAX_DELAY_STEPS=<steps of 5 ms>`. MPJPE over successful clips:
+
+| Set | v0.1 | v1.0 |
+|---|---|---|
+| Unseen 1,985, full length, no latency | 92.3%, MPJPE-L 15.3 mm | 90.7%, 17.0 mm |
+| Unseen 1,985, full length, 40 ms | 70.4%, 16.1 mm | 89.4%, 16.9 mm |
+| Seen 2,000, 10 s, no latency | 98.1%, 15.4 mm | 97.3%, 16.6 mm |
+
+**ONNX vs PyTorch, v1.0** (400 clips): 384/400 clips max |Δa| ≤ 2e-5 (median 2e-6); 15 clips show one isolated FSQ
+token flip (≤ 3.5e-2). Closed loop, 200 unseen at +20 ms: ONNX 96.5% / 90.0%, 17.81 mm vs PyTorch 96.5% / 90.0%, 17.76 mm.
+
+**Hardware:** v1.0 was run on a physical Booster K1 with [`sonic_k1_deploy`](../../sonic_k1_deploy/) on the onboard
+computer (walking and turning, squats, lunges, shadow boxing).
+
+---
+
+# v0.1 (it50000)
 
 ## Sets
 - **Unseen:** 1,985 Bones-SEED clips held out before training. Never sampled during training.

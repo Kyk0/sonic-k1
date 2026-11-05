@@ -26,6 +26,7 @@ subject to the BONES Motion Capture Dataset License Agreement. No motion data is
 Files added (A) or modified (M) relative to upstream v1.1
   M	.gitattributes
   A	gear_sonic/config/exp/manager/universal_token/all_modes/sonic_k1.yaml
+  A	gear_sonic/config/exp/manager/universal_token/all_modes/sonic_k1_legs.yaml
   A	gear_sonic/config/manager_env/recorders/trajectory.yaml
   A	gear_sonic/data/assets/robot_description/mjcf/k1.xml
   A	gear_sonic/data/assets/robot_description/mjcf/meshes
@@ -34,14 +35,19 @@ Files added (A) or modified (M) relative to upstream v1.1
   A	gear_sonic/data_process/convert_k1_csv_to_motion_lib.py
   A	gear_sonic/data_process/convert_k1_npz_to_motion_lib.py
   M	gear_sonic/envs/manager_env/mdp/commands.py
+  M	gear_sonic/envs/manager_env/mdp/actuators.py
+  M	gear_sonic/envs/manager_env/mdp/curriculum.py
+  M	gear_sonic/envs/manager_env/mdp/events.py
   M	gear_sonic/envs/manager_env/mdp/rewards.py
   M	gear_sonic/envs/manager_env/modular_tracking_env_cfg.py
   M	gear_sonic/envs/manager_env/robots/__init__.py
   A	gear_sonic/envs/manager_env/robots/k1.py
   M	gear_sonic/eval_agent_trl.py
   A	gear_sonic/scripts/eval_k1_mujoco.py
+  A	gear_sonic/scripts/deploy_k1_booster.py, deploy_k1_README.md, deploy_test_ladder.json
   A	gear_sonic/scripts/k1_actor_only_checkpoint.py
   A	gear_sonic/scripts/k1_clean_onnx.py
+  A	gear_sonic/scripts/play_k1.py
   M	gear_sonic/train_agent_trl.py
   M	gear_sonic/trl/callbacks/im_eval_callback.py
   M	gear_sonic/trl/utils/order_converter.py
@@ -49,6 +55,7 @@ Files added (A) or modified (M) relative to upstream v1.1
   A	gear_sonic/utils/k1_reset_check.py
   A	gear_sonic/utils/k1_rollout_recorder.py
   A	gear_sonic/data/assets/robot_description/urdf/k1/meshes/*.STL (52 Booster K1 meshes)
+  A	sonic_k1_deploy/ (robot app: app.py, robot.py, sonic_k1.py, make_motion.py, make_kit.sh, run.sh, fake_booster/)
 
 Sample motions (examples/k1/motions/*.npz): robot trajectories recorded from SONIC-K1 in MuJoCo while it tracked
 held-out Bones-SEED clips retargeted to the Booster K1. They contain no human motion capture data. Training data
