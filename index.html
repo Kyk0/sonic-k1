@@ -6,7 +6,7 @@
 <title>SONIC-K1</title>
 <meta name="description" content="NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid. One policy, 10K motions, open weights.">
 <meta property="og:title" content="SONIC-K1: the first open-weights motion tracker for small humanoids">
-<meta property="og:description" content="The first open-weights motion tracker for small humanoids, running on the Booster K1. 97.4% of unseen motions, 93.6% on PHUMA, under 1% of SONIC's compute.">
+<meta property="og:description" content="The first open-weights motion tracker for small humanoids, now tested on a real Booster K1. 97.4% of unseen motions; 96.6% with real-robot torque limits and 40 ms delay; about 1% of SONIC's compute.">
 <meta property="og:image" content="https://kyry.me/sonic-k1/media/og_card.jpg">
 <meta property="og:url" content="https://kyry.me/sonic-k1/">
 <meta name="twitter:image" content="https://kyry.me/sonic-k1/media/og_card.jpg">
@@ -136,6 +136,19 @@ h2{font-size:clamp(32px,5vw,54px);font-weight:800;letter-spacing:-.035em;line-he
 .brow .bv{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;font-size:15px}
 .brow:hover .fill{filter:brightness(1.15)}
 .bsep{border-top:1px solid var(--line);margin:8px 0}
+.vrow{display:grid;grid-template-columns:minmax(150px,280px) 1fr 58px;align-items:center;column-gap:14px;row-gap:5px;padding:9px 0}
+.vrow .bl{grid-row:1/3;font-size:14.5px;line-height:1.3}
+.vrow .bl small{display:block;color:var(--muted);font-size:12.5px}
+.vrow .track{height:10px;border-radius:4px;background:var(--grid);position:relative;overflow:hidden}
+.vrow .fill{position:absolute;inset:0 auto 0 0;border-radius:0 4px 4px 0;width:0;transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
+.vrow .fill.v1{background:var(--series-1)}.vrow .fill.v0{background:var(--dim)}
+.vrow .bv{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;font-size:14px}
+.vrow .bv.v0{color:var(--muted);font-weight:500}
+.vleg{display:flex;gap:18px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.vleg span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--dim)}
+.vleg span.v1::before{background:var(--series-1)}
+@media (max-width:560px){.vrow{grid-template-columns:1fr 52px}.vrow .bl{grid-row:auto;grid-column:1/3}}
+.soon li.done i{background:var(--accent);box-shadow:inset 0 0 0 3px var(--card)}
 .note{font-size:13px;color:var(--dim);margin-top:12px}
 @media (max-width:560px){.brow{grid-template-columns:1fr 52px}.brow .track{grid-column:1/3;grid-row:2}}
 .charts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px;background:none}
@@ -208,9 +221,9 @@ footer a{color:var(--muted)}
 <header class="hero" id="top">
   <video src="media/hero_web.mp4" poster="media/og.jpg" autoplay muted loop playsinline></video>
   <div class="inner">
-    <span class="eyebrow"><i></i>The first open-weights motion tracker for small humanoids</span>
+    <span class="eyebrow"><i></i>v1.0 · now tested on a real Booster K1</span>
     <h1>SONIC<span>-K1</span></h1>
-    <p class="lead">One policy that tracks <b>thousands of human motions</b>. NVIDIA's SONIC, ported to the Booster K1 and trained from scratch with <b>under 1% of the original compute</b>.</p>
+    <p class="lead">One policy that tracks <b>thousands of human motions</b>. NVIDIA's SONIC, ported to the Booster K1, trained from scratch with <b>about 1% of the original compute</b>, and fine-tuned to run on the real robot.</p>
     <div class="btns">
       <a class="btn primary" href="https://huggingface.co/Kyry10/sonic-k1">🤗&nbsp; Get the weights</a>
       <a class="btn glass" href="https://github.com/Kyk0/sonic-k1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.7 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>Code</a>
@@ -223,9 +236,9 @@ footer a{color:var(--muted)}
 <main class="wrap">
   <div class="stats reveal">
     <div class="stat"><b><span data-count="97.4" data-dec="1">0</span><em>%</em></b><small>of 1,985 unseen motions tracked, scored with SONIC's own success rule</small></div>
-    <div class="stat"><b><span data-count="93.6" data-dec="1">0</span><em>%</em></b><small>on PHUMA, the SONIC paper's external benchmark (BeyondMimic, as reported by SONIC: 73.8%)</small></div>
+    <div class="stat"><b><span data-count="96.6" data-dec="1">0</span><em>%</em></b><small>with the real robot's torque limits and 40&nbsp;ms of control delay (v0.1: 76.7%)</small></div>
     <div class="stat"><b><span data-count="10" data-dec="0">0</span><em>K</em></b><small>mocap clips in training, one policy for all of them</small></div>
-    <div class="stat"><b>&lt;<span data-count="1" data-dec="0">0</span><em>%</em></b><small>of SONIC's training compute, about 100 GPU-hours</small></div>
+    <div class="stat"><b>~<span data-count="1" data-dec="0">0</span><em>%</em></b><small>of SONIC's training compute, about 110 GPU-hours</small></div>
   </div>
 
   <section id="how" class="reveal">
@@ -262,17 +275,31 @@ footer a{color:var(--muted)}
     <h2>How it compares.</h2>
     <p class="sub">Success on motions the policy never trained on, scored with SONIC's own rule, next to the numbers in the SONIC paper. Higher is better.</p>
     <div class="tablewrap"><table class="cmp">
-      <thead><tr><th>Benchmark</th><th class="us">SONIC-K1<br><small>ours · Booster K1</small></th><th>SONIC<sup>*</sup><br><small>NVIDIA · G1</small></th><th>BeyondMimic<sup>*</sup><br><small>G1</small></th><th>Any2Track<sup>*</sup><br><small>G1</small></th></tr></thead>
+      <thead><tr><th>Benchmark</th><th class="us">SONIC-K1 v1.0<br><small>ours · Booster K1</small></th><th>SONIC<sup>*</sup><br><small>NVIDIA · G1</small></th><th>BeyondMimic<sup>*</sup><br><small>G1</small></th><th>Any2Track<sup>*</sup><br><small>G1</small></th></tr></thead>
       <tbody>
-        <tr><td>PHUMA<small>external benchmark, 15 motion sources</small></td><td class="us n">93.6%</td><td class="n">97.2%</td><td class="n">73.8%</td><td class="n">78.5%</td></tr>
+        <tr><td>PHUMA<small>external benchmark, 15 motion sources</small></td><td class="us n">92.3%</td><td class="n">97.2%</td><td class="n">73.8%</td><td class="n">78.5%</td></tr>
         <tr><td>Held-out mocap<small>motions unseen in training (ours: 1,985 Bones-SEED clips; SONIC: in-house test set)</small></td><td class="us n">97.4%</td><td class="n">98.5%</td><td class="n">82.0%</td><td class="n">61.6%</td></tr>
       </tbody>
     </table></div>
     <div class="card" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
-      <div><h3 style="margin:0 0 4px">100STYLE: 100 ways to walk and run</h3><p style="margin:0">Zombie, penguin, dinosaur, drunk, superman, proud: 100 walking and running styles from a public dataset it never trained on.</p></div>
+      <div><h3 style="margin:0 0 4px">100STYLE: 100 ways to walk and run</h3><p style="margin:0">Zombie, penguin, dinosaur, drunk, superman, proud: 100 walking and running styles from a public dataset it never trained on (v0.1).</p></div>
       <div style="font-size:44px;font-weight:900;letter-spacing:-.04em;color:var(--accent)">99.0%</div>
     </div>
     <p class="note">All numbers use the SONIC paper's success rule (a rollout fails if the root or a hand/foot height drifts more than 0.25&nbsp;m from the reference), in MuJoCo. <sup>*</sup>Reported in the SONIC paper (Luo et al., 2025); we did not rerun these methods. They run on the 1.3&nbsp;m Unitree G1 with their own data and retargeting, so this is an indicative comparison, not a controlled one.</p>
+  </section>
+
+  <section id="real" class="reveal">
+    <div class="kicker">New in v1.0</div>
+    <h2>Ready for the real K1.</h2>
+    <p class="sub">v1.0 is fine-tuned with the real robot's motor torque limits and up to 40&nbsp;ms of control delay. It runs on the K1's own computer with our open robot app: pick a motion, press go, and a damping key stops it at any moment.</p>
+    <div class="bars viz-root" id="vbars" role="img" aria-label="Share of unseen motions finished, v0.1 versus v1.0, under real-robot conditions">
+      <div class="vleg"><span>v0.1</span><span class="v1">v1.0</span></div>
+    </div>
+    <p class="note">MuJoCo, SONIC's success rule, all 1,985 unseen Bones-SEED motions (PHUMA: 1,758). Real-robot = Booster's deploy torque limits, sensor noise and the given delay.</p>
+    <div class="code" style="margin-top:18px"><button class="copy" data-copy="rk">Copy</button><pre id="rk">bash sonic_k1_deploy/make_kit.sh sonic_k1_kit       # code + weights + K1 model + sample motions
+scp -r sonic_k1_kit booster@&lt;robot-ip&gt;:~/
+ssh booster@&lt;robot-ip&gt; 'cd sonic_k1_kit &amp;&amp; ./run.sh --dry-run'   # then ./run.sh, robot in a belt</pre></div>
+    <p class="note">Guide: <a href="https://github.com/Kyk0/sonic-k1/tree/main/sonic_k1_deploy">sonic_k1_deploy</a>. Start in a safety belt with a hand on the damping key.</p>
   </section>
 
   <section id="robust" class="reveal">
@@ -280,7 +307,7 @@ footer a{color:var(--muted)}
     <h2>Stays on its feet.</h2>
     <p class="sub">We made things go wrong on purpose and counted how many unseen motions it still finished without falling.</p>
     <div class="bars viz-root" id="bars" role="img" aria-label="Share of unseen motions finished without a fall under each disturbance"></div>
-    <p class="note">MuJoCo, 200 unseen motions per row (the last row uses all 1,985). Hover a bar for details.</p>
+    <p class="note">v0.1 (iteration 50,000). MuJoCo, 200 unseen motions per row (the last row uses all 1,985). Hover a bar for details.</p>
   </section>
 
   <section class="reveal">
@@ -301,9 +328,9 @@ python gear_sonic/scripts/play_k1.py --record demo.mp4</pre></div>
     <div class="kicker">Coming soon</div>
     <h2>Next for SONIC-K1.</h2>
     <ul class="soon">
-      <li><i></i><div><b>Real K1 runs</b><span>The policy on a physical Booster K1, with videos.</span></div></li>
+      <li class="done"><i></i><div><b>Real K1 runs</b><span>Done in v1.0: the policy runs on a physical Booster K1. Videos coming.</span></div></li>
+      <li class="done"><i></i><div><b>Deployment controller</b><span>Done in v1.0: an open robot app for the Booster SDK (<a href="https://github.com/Kyk0/sonic-k1/tree/main/sonic_k1_deploy">sonic_k1_deploy</a>).</span></div></li>
       <li><i></i><div><b>Whole-body teleop</b><span>Drive the K1 live from a VR headset.</span></div></li>
-      <li><i></i><div><b>Deployment controller</b><span>An open runtime for the Booster SDK.</span></div></li>
       <li><i></i><div><b>Video to K1</b><span>Film a move with your phone and the K1 does it.</span></div></li>
       <li><i></i><div><b>Bigger model</b><span>Trained on 62K motions, 6&times; more.</span></div></li>
     </ul>
@@ -311,7 +338,7 @@ python gear_sonic/scripts/play_k1.py --record demo.mp4</pre></div>
 
   <div class="cta reveal">
     <h2>Open weights. Open code.</h2>
-    <p class="sub" style="margin:0 auto">PyTorch and ONNX policies, configs, the MuJoCo player and the full K1 port of SONIC.</p>
+    <p class="sub" style="margin:0 auto">PyTorch and ONNX policies, configs, the MuJoCo player, the robot app and the full K1 port of SONIC.</p>
     <div class="btns">
       <a class="btn primary" href="https://huggingface.co/Kyry10/sonic-k1">🤗&nbsp; Hugging Face</a>
       <a class="btn glass" href="https://github.com/Kyk0/sonic-k1">GitHub</a>
@@ -374,6 +401,16 @@ const ROWS=[
   ['Booster factory torque limits','about half of what it trained with',99.0],
   ['All real-robot limits at once','factory torque limits + 20 ms delay + softer gains, all 1,985 motions',95.9,1],
 ];
+// v1.0 vs v0.1: two bars per condition (% of unseen motions finished, SONIC's rule, MuJoCo)
+const VROWS=[
+  ['Normal conditions','1,985 unseen motions',97.5,97.4],
+  ['Real-robot, 20 ms delay','torque limits + sensor noise',95.5,97.1],
+  ['Real-robot, 40 ms delay','torque limits + sensor noise',76.7,96.6],
+  ['PHUMA, real-robot, 40 ms','external benchmark, 1,758 motions',78.0,91.7],
+];
+const vbars=document.getElementById('vbars');
+vbars.insertAdjacentHTML('beforeend',VROWS.map(r=>`<div class="vrow" title="${r[0]}: v0.1 ${r[2]}%, v1.0 ${r[3]}%"><div class="bl">${r[0]}<small>${r[1]}</small></div><div class="track"><div class="fill v0" data-w="${r[2]}"></div></div><div class="bv v0">${r[2].toFixed(1)}%</div><div class="track"><div class="fill v1" data-w="${r[3]}"></div></div><div class="bv">${r[3].toFixed(1)}%</div></div>`).join(''));
+new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){vbars.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%');o.disconnect()}}),{threshold:.2}).observe(vbars);
 const bars=document.getElementById('bars');
 bars.innerHTML=ROWS.map((r,i)=>(i===ROWS.length-1?'<div class="bsep"></div>':'')+`<div class="brow${r[3]?' key':''}" title="${r[0]}: ${r[2]}% finished without a fall"><div class="bl">${r[0]}<small>${r[1]}</small></div><div class="track"><div class="fill" data-w="${r[2]}"></div></div><div class="bv">${r[2].toFixed(1)}%</div></div>`).join('');
 new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){bars.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%');o.disconnect()}}),{threshold:.2}).observe(bars);
