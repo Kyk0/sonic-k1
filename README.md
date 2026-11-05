@@ -2,12 +2,12 @@
 <p align="center"><b>NVIDIA's SONIC whole-body motion tracker, ported to the Booster K1 humanoid.</b><br>The first open-weights motion tracker for small humanoids.<br>
 One policy, thousands of human motions, trained from scratch with under 1% of SONIC's compute.</p>
 
-<p align="center"><b><a href="https://kyry.me/sonic-k1/">🌐 Project page &amp; videos</a> · <a href="#try-it-in-2-minutes-laptop-no-gpu">▶ Try it in 2 minutes</a> · <a href="sonic_k1_deploy/">🤖 Run it on a K1</a></b></p>
+<p align="center"><b><a href="https://kyry.me/sonic-k1/">🌐 Project page &amp; videos</a> · <a href="https://arxiv.org/abs/2610.39327">📄 Paper</a> · <a href="#try-it-in-2-minutes-laptop-no-gpu">▶ Try it in 2 minutes</a> · <a href="sonic_k1_deploy/">🤖 Run it on a K1</a></b></p>
 
 <p align="center">
   <a href="https://huggingface.co/Kyry10/sonic-k1"><img src="https://img.shields.io/badge/🤗%20weights-Kyry10%2Fsonic--k1-yellow"></a>
   <a href="https://kyry.me/sonic-k1/"><img src="https://img.shields.io/badge/project-page-8fe04a"></a>
-  <a href="https://arxiv.org/abs/2511.07820"><img src="https://img.shields.io/badge/SONIC-arXiv%202511.07820-b31b1b"></a>
+  <a href="https://arxiv.org/abs/2610.39327"><img src="https://img.shields.io/badge/arXiv-2610.39327-b31b1b"></a>
   <img src="https://img.shields.io/badge/robot-Booster%20K1%2022--DoF-blue">
   <img src="https://img.shields.io/badge/sim2sim-Isaac%20→%20MuJoCo-green">
   <img src="https://img.shields.io/badge/tested-real%20K1-orange">
@@ -158,7 +158,17 @@ See [`NOTICE`](NOTICE) for the complete list of modified files.
 - **Training data includes Motion Data by Bones Studio** ([bones.studio](https://bones.studio/)).
   Use of the underlying dataset is subject to the BONES Motion Capture Dataset License Agreement.
 
-Built on [SONIC](https://arxiv.org/abs/2511.07820) by NVIDIA GEAR. Please cite it (and this repo, through
-[`docs/k1/CITATION.cff`](docs/k1/CITATION.cff)) if this helps your work.
+Built on [SONIC](https://arxiv.org/abs/2511.07820) by NVIDIA GEAR. If this helps your work, please cite SONIC and our
+[preprint](https://arxiv.org/abs/2610.39327):
+```bibtex
+@misc{kolesnichenko2026sonick1,
+  title         = {{SONIC-K1}: Porting a Universal Humanoid Motion Tracker to a Small Humanoid on a Single {GPU}},
+  author        = {Kolesnichenko, Kyrylo and Cardenas, Irvin Steve and Kim, Jong-Hoon},
+  year          = {2026},
+  eprint        = {2610.39327},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO}
+}
+```
 
 Made by [Kyrylo Kolesnichenko](https://kyry.me) at ATR Lab.

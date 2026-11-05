@@ -16,6 +16,19 @@ keywords:
   - motion-tracking
   - whole-body-control
   - reinforcement-learning
+preferred-citation:
+  type: article
+  title: "SONIC-K1: Porting a Universal Humanoid Motion Tracker to a Small Humanoid on a Single GPU"
+  authors:
+    - family-names: "Kolesnichenko"
+      given-names: "Kyrylo"
+    - family-names: "Cardenas"
+      given-names: "Irvin Steve"
+    - family-names: "Kim"
+      given-names: "Jong-Hoon"
+  journal: "arXiv preprint arXiv:2610.39327"
+  year: 2026
+  url: "https://arxiv.org/abs/2610.39327"
 references:
   - type: article
     title: "SONIC: Supersizing Motion Tracking for Natural Humanoid Whole-Body Control"
